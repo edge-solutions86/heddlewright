@@ -1,5 +1,6 @@
 import { array, oneOf, positiveInteger } from '../util/check.js';
-import { createMatrix, assertMatrix, dimensions } from '../util/matrix.js';
+import { createMatrix, assertMatrix, dimensions, columns } from '../util/matrix.js';
+import { duplicateGroups } from '../util/indexing.js';
 import { assertThreading } from './threading.js';
 import { SHED_TYPES } from './tieup.js';
 import { liftplanFromTreadling } from './liftplan.js';
@@ -74,14 +75,10 @@ export function warpFaceRatio(drawdown) {
 /** Ends that never lift, so their warp lies loose down the back of the cloth. */
 export function unwovenEnds(drawdown) {
   assertMatrix(drawdown, 'drawdown');
-  const out = [];
-  for (let e = 0; e < drawdown[0].length; e += 1) {
-    const columnCells = drawdown.map((row) => row[e]);
-    if (columnCells.every((cell) => cell === 1) || columnCells.every((cell) => cell === 0)) {
-      out.push({ end: e + 1, state: columnCells[0] === 1 ? 'always up' : 'always down' });
-    }
-  }
-  return out;
+  return columns(drawdown)
+    .map((column, index) => ({ column, end: index + 1 }))
+    .filter(({ column }) => column.every((cell) => cell === column[0]))
+    .map(({ column, end }) => ({ end, state: column[0] === 1 ? 'always up' : 'always down' }));
 }
 
 /** Picks that never bind, so the weft simply lies on the surface. */
@@ -99,13 +96,7 @@ export function unwovenPicks(drawdown) {
 /** Two ends that lift identically on every pick, so they weave as one thread. */
 export function pairedEnds(drawdown) {
   assertMatrix(drawdown, 'drawdown');
-  const groups = new Map();
-  for (let e = 0; e < drawdown[0].length; e += 1) {
-    const key = drawdown.map((row) => row[e]).join('');
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(e + 1);
-  }
-  return [...groups.values()].filter((group) => group.length > 1);
+  return duplicateGroups(columns(drawdown), (column) => column.join(''));
 }
 
 /** The back of the cloth, which is the face with every cell swapped. */

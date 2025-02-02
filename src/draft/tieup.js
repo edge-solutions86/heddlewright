@@ -1,6 +1,7 @@
 import { DraftError } from '../util/errors.js';
 import { array, integer, positiveInteger, oneOf } from '../util/check.js';
 import { createMatrix, assertMatrix, transpose } from '../util/matrix.js';
+import { positionsWhere, setPositions, duplicateGroups } from '../util/indexing.js';
 
 /**
  * The tie-up: which shafts each treadle lifts. Held as an array of sorted,
@@ -51,9 +52,7 @@ export function tieupMatrix(tieup, shafts) {
 /** Read a treadle-by-shaft matrix back into the list form. */
 export function tieupFromMatrix(matrix) {
   assertMatrix(matrix, 'tieup matrix');
-  return matrix.map((row) =>
-    row.map((cell, shaft) => (cell === 1 ? shaft + 1 : 0)).filter((shaft) => shaft !== 0),
-  );
+  return matrix.map((row) => setPositions(row));
 }
 
 /** The shaft-by-treadle view, which is how a countermarch loom is corded. */
@@ -77,21 +76,12 @@ export function convertShed(tieup, shafts, from, to) {
 
 /** Treadles tied to nothing, which a weaver has left spare on the lamms. */
 export function untiedTreadles(tieup, shafts) {
-  return normaliseTieup(tieup, shafts)
-    .map((entry, index) => (entry.length === 0 ? index + 1 : 0))
-    .filter((treadle) => treadle !== 0);
+  return positionsWhere(normaliseTieup(tieup, shafts), (entry) => entry.length === 0);
 }
 
 /** Treadles tied identically, which are interchangeable at the loom. */
 export function duplicateTreadles(tieup, shafts) {
-  const normalised = normaliseTieup(tieup, shafts);
-  const groups = new Map();
-  for (const [index, entry] of normalised.entries()) {
-    const key = entry.join(',');
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(index + 1);
-  }
-  return [...groups.values()].filter((group) => group.length > 1);
+  return duplicateGroups(normaliseTieup(tieup, shafts), (entry) => entry.join(','));
 }
 
 /** How many shafts each treadle lifts, which is the weight on the foot. */

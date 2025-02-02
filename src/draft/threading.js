@@ -1,6 +1,7 @@
 import { DraftError } from '../util/errors.js';
 import { array, integer, positiveInteger, oneOf } from '../util/check.js';
 import { mod } from '../util/numeric.js';
+import { positionsOf } from '../util/indexing.js';
 
 /**
  * Threading: which shaft each warp end is threaded through, read left to right
@@ -144,17 +145,13 @@ export function shaftLoad(threading, shafts) {
 
 /** Shafts with nothing threaded on them, which means heddles standing idle. */
 export function idleShafts(threading, shafts) {
-  return shaftLoad(threading, shafts)
-    .map((count, index) => (count === 0 ? index + 1 : 0))
-    .filter((shaft) => shaft !== 0);
+  return positionsOf(shaftLoad(threading, shafts), 0);
 }
 
 /** The 1-based end positions threaded on a given shaft. */
 export function endsOnShaft(threading, shaft) {
   positiveInteger(shaft, 'shaft');
-  return threading
-    .map((value, index) => (value === shaft ? index + 1 : 0))
-    .filter((end) => end !== 0);
+  return positionsOf(threading, shaft);
 }
 
 /** The lowest shaft count a threading could be rewritten onto. */

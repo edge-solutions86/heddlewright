@@ -2,6 +2,7 @@ import { DraftError } from '../util/errors.js';
 import { array, integer, positiveInteger } from '../util/check.js';
 import { mod } from '../util/numeric.js';
 import { period } from '../util/cycle.js';
+import { positionsWhere, positionsOf } from '../util/indexing.js';
 
 /**
  * Treadling: which treadles are pressed for each pick, in weaving order.
@@ -28,9 +29,7 @@ export function normaliseTreadling(treadling, treadles) {
 /** A pick pressing no treadle leaves the weft lying loose across the warp. */
 export function assertNoBlankPicks(treadling, treadles) {
   const normalised = normaliseTreadling(treadling, treadles);
-  const blanks = normalised
-    .map((pick, index) => (pick.length === 0 ? index + 1 : 0))
-    .filter((pick) => pick !== 0);
+  const blanks = positionsWhere(normalised, (pick) => pick.length === 0);
   if (blanks.length > 0) {
     throw new DraftError('a pick presses no treadle', { picks: blanks });
   }
@@ -123,9 +122,7 @@ export function treadleUsage(treadling, treadles) {
 
 /** Treadles the treadling never presses, so their cords could be freed. */
 export function unusedTreadles(treadling, treadles) {
-  return treadleUsage(treadling, treadles)
-    .map((count, index) => (count === 0 ? index + 1 : 0))
-    .filter((treadle) => treadle !== 0);
+  return positionsOf(treadleUsage(treadling, treadles), 0);
 }
 
 /** Repeat a treadling until it reaches `picks`, cutting mid-repeat if it must. */

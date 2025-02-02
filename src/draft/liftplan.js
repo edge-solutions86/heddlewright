@@ -1,6 +1,7 @@
 import { CapacityError } from '../util/errors.js';
 import { array, integer, positiveInteger } from '../util/check.js';
 import { createMatrix, assertMatrix, dimensions } from '../util/matrix.js';
+import { setPositions, labelDistinct } from '../util/indexing.js';
 import { normaliseTieup } from './tieup.js';
 import { normaliseTreadling } from './treadling.js';
 
@@ -40,24 +41,18 @@ export function liftplanFromTreadling(tieup, treadling, { shafts, treadles }) {
  */
 export function treadlingFromLiftplan(liftplan, { treadles } = {}) {
   assertMatrix(liftplan, 'liftplan');
-  const seen = new Map();
-  const tieup = [];
-  const treadling = [];
-  for (const row of liftplan) {
-    const key = row.join('');
-    if (!seen.has(key)) {
-      seen.set(key, tieup.length + 1);
-      tieup.push(row.map((cell, shaft) => (cell === 1 ? shaft + 1 : 0)).filter((s) => s !== 0));
-    }
-    treadling.push([seen.get(key)]);
-  }
-  if (treadles !== undefined && tieup.length > treadles) {
+  const { labels, representatives, count } = labelDistinct(liftplan, (row) => row.join(''));
+  if (treadles !== undefined && count > treadles) {
     throw new CapacityError('the liftplan needs more treadles than the loom has', {
-      needed: tieup.length,
+      needed: count,
       treadles,
     });
   }
-  return { tieup, treadling, treadles: tieup.length };
+  return {
+    tieup: representatives.map((row) => setPositions(row)),
+    treadling: labels.map((label) => [label]),
+    treadles: count,
+  };
 }
 
 /** A liftplan straight from a shaft-per-pick list, for a direct-tie dobby. */
@@ -78,9 +73,7 @@ export function liftplanFromShaftLists(shaftLists, shafts) {
 /** The shafts lifted on each pick, as 1-based lists. */
 export function shaftListsFromLiftplan(liftplan) {
   assertMatrix(liftplan, 'liftplan');
-  return liftplan.map((row) =>
-    row.map((cell, shaft) => (cell === 1 ? shaft + 1 : 0)).filter((shaft) => shaft !== 0),
-  );
+  return liftplan.map((row) => setPositions(row));
 }
 
 /** How many shafts each pick lifts, which sizes the dobby cylinder load. */
