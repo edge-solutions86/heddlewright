@@ -1,6 +1,6 @@
 import { ConflictError, InvalidArgument, NotFound } from '../util/errors.js';
 import { array, integer, nonEmptyString, plainObject } from '../util/check.js';
-import { canonicalStringify, deepFreeze } from '../util/json.js';
+import { canonicalClone, canonicalStringify, deepFreeze } from '../util/json.js';
 import { stableHash } from '../util/ids.js';
 
 /**
@@ -32,7 +32,10 @@ export function append(journal, { type, payload = {}, at }) {
   const entry = {
     sequence,
     type,
-    payload,
+    // The journal takes its own copy. Freezing the caller's object instead
+    // would reach back out of the store and lock a record the caller still
+    // means to edit, which is a surprise nobody would connect to appending.
+    payload: canonicalClone(payload),
     at: at ?? null,
     previous,
   };
