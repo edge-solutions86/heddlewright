@@ -9,6 +9,7 @@ import {
   positiveNumber,
 } from '../util/check.js';
 import { roundTo } from '../util/numeric.js';
+import { groupBy } from '../util/group.js';
 
 /**
  * The loom register.
@@ -135,7 +136,9 @@ export function widthUtilisation(loom, requirements) {
 
 /** The register grouped by shedding motion. */
 export function byShedding(looms) {
-  const groups = new Map(SHEDDING.map((kind) => [kind, []]));
-  for (const loom of looms) groups.get(loom.shedding).push(loom.reference);
-  return [...groups.entries()].map(([shedding, references]) => ({ shedding, references }));
+  const found = groupBy(looms, (loom) => loom.shedding);
+  return SHEDDING.map((shedding) => ({
+    shedding,
+    references: (found.get(shedding) ?? []).map((loom) => loom.reference),
+  }));
 }

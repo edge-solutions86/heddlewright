@@ -1,6 +1,7 @@
 import { NotFound } from '../util/errors.js';
 import { array, nonEmptyString, number, oneOf, plainObject } from '../util/check.js';
 import { roundTo } from '../util/numeric.js';
+import { tally } from '../util/group.js';
 import { defectPoints } from './fourpoint.js';
 
 /**
@@ -83,27 +84,22 @@ export function recordSheet(entries) {
 
 /** Points and counts grouped by fault, worst first. */
 export function byFault(defects) {
-  return group(defects, (defect) => defect.code, 'code');
+  return tally(defects, {
+    key: (defect) => defect.code,
+    label: 'code',
+    fields: { points: (defect) => defect.points },
+    sortBy: 'points',
+  });
 }
 
 /** Points and counts grouped by where the fault came from, worst first. */
 export function byOrigin(defects) {
-  return group(defects, (defect) => defect.origin, 'origin');
-}
-
-function group(defects, keyOf, label) {
-  array(defects, 'defects');
-  const totals = new Map();
-  for (const defect of defects) {
-    const key = keyOf(defect);
-    const running = totals.get(key) ?? { [label]: key, count: 0, points: 0 };
-    running.count += 1;
-    running.points += defect.points;
-    totals.set(key, running);
-  }
-  return [...totals.values()].sort(
-    (a, b) => b.points - a.points || String(a[label]).localeCompare(String(b[label])),
-  );
+  return tally(defects, {
+    key: (defect) => defect.origin,
+    label: 'origin',
+    fields: { points: (defect) => defect.points },
+    sortBy: 'points',
+  });
 }
 
 /** Where most of the trouble is coming from, or null when nothing is booked. */

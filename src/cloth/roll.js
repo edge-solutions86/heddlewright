@@ -9,6 +9,7 @@ import {
 } from '../util/check.js';
 import { roundTo, sum } from '../util/numeric.js';
 import { contentId } from '../util/ids.js';
+import { tallyOver } from '../util/group.js';
 
 /**
  * The piece register.
@@ -105,23 +106,24 @@ export function regrade(piece, grade) {
 /** The totals a register adds up to, by grade and overall. */
 export function registerTotals(pieces) {
   array(pieces, 'pieces');
-  const byGrade = new Map(GRADES.map((grade) => [grade, { grade, pieces: 0, yards: 0 }]));
   for (const [index, piece] of pieces.entries()) {
     plainObject(piece, `pieces[${index}]`);
-    const running = byGrade.get(piece.grade);
-    if (running === undefined) {
+    if (!GRADES.includes(piece.grade)) {
       throw new InvalidArgument(`piece ${piece.reference} carries an unknown grade`, {
         grade: piece.grade,
       });
     }
-    running.pieces += 1;
-    running.yards = roundTo(running.yards + piece.yards, 3);
   }
+  const byGrade = tallyOver(GRADES, pieces, {
+    key: (piece) => piece.grade,
+    label: 'grade',
+    fields: { yards: (piece) => piece.yards },
+  }).map(({ grade, count, yards }) => ({ grade, pieces: count, yards }));
   return {
     pieces: pieces.length,
     yards: roundTo(sum(pieces.map((piece) => piece.yards)), 3),
     squareYards: roundTo(sum(pieces.map((piece) => piece.squareYards)), 3),
-    byGrade: [...byGrade.values()],
+    byGrade,
   };
 }
 

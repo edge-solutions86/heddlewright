@@ -1,6 +1,7 @@
 import { InvalidArgument } from '../util/errors.js';
 import { array, nonEmptyString, number, plainObject, positiveNumber } from '../util/check.js';
 import { roundTo, sum } from '../util/numeric.js';
+import { tally } from '../util/group.js';
 
 /**
  * Loom efficiency and where it goes.
@@ -56,20 +57,20 @@ export function efficiency({ shiftMinutes, stops }) {
   return roundTo((shiftMinutes - lost) / shiftMinutes, 4);
 }
 
-/** The losses broken down by cause, worst first. */
+/**
+ * The losses broken down by cause, worst first. The count is the number of
+ * stops rather than the number of records, because a shed books twenty weft
+ * breaks on one line and that line is not twenty stops until it is read as one.
+ */
 export function lossByCause(stops) {
   array(stops, 'stops');
-  const totals = new Map();
-  for (const [index, stop] of stops.entries()) {
-    const record = normaliseStop(stop, index);
-    const running = totals.get(record.cause) ?? { cause: record.cause, count: 0, minutesLost: 0 };
-    running.count += record.count;
-    running.minutesLost = roundTo(running.minutesLost + record.minutesLost, 3);
-    totals.set(record.cause, running);
-  }
-  return [...totals.values()].sort(
-    (a, b) => b.minutesLost - a.minutesLost || a.cause.localeCompare(b.cause),
-  );
+  const records = stops.map((stop, index) => normaliseStop(stop, index));
+  return tally(records, {
+    key: (record) => record.cause,
+    label: 'cause',
+    fields: { count: (record) => record.count, minutesLost: (record) => record.minutesLost },
+    sortBy: 'minutesLost',
+  });
 }
 
 /**

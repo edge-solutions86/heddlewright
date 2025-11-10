@@ -1,6 +1,7 @@
 import { ConflictError, InvalidArgument } from '../util/errors.js';
 import { nonEmptyString, oneOf, plainObject, positiveNumber } from '../util/check.js';
 import { roundTo } from '../util/numeric.js';
+import { tallyOver } from '../util/group.js';
 import { contentId } from '../util/ids.js';
 
 /**
@@ -100,22 +101,23 @@ export function openOrders(orders) {
 
 /** The order book, totalled by state. */
 export function orderBook(orders) {
-  const states = new Map(
-    [...ORDER_STATES, CANCELLED].map((state) => [state, { state, orders: 0, metres: 0, value: 0 }]),
-  );
-  for (const order of orders) {
-    const running = states.get(order.state);
-    running.orders += 1;
-    running.metres = roundTo(running.metres + order.metres, 3);
-    running.value = roundTo(running.value + order.value, 2);
-  }
+  const totals = tallyOver([...ORDER_STATES, CANCELLED], orders, {
+    key: (order) => order.state,
+    label: 'state',
+    fields: { metres: (order) => order.metres, value: (order) => order.value },
+  });
   return {
     orders: orders.length,
     openMetres: roundTo(
       orders.filter((order) => isOpen(order)).reduce((total, order) => total + order.metres, 0),
       3,
     ),
-    byState: [...states.values()],
+    byState: totals.map(({ state, count, metres, value }) => ({
+      state,
+      orders: count,
+      metres,
+      value: roundTo(value, 2),
+    })),
   };
 }
 

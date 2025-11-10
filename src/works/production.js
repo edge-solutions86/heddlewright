@@ -1,6 +1,7 @@
 import { ConflictError, InvalidArgument } from '../util/errors.js';
 import { array, nonEmptyString, number, plainObject, positiveNumber } from '../util/check.js';
 import { roundTo, sum } from '../util/numeric.js';
+import { tally, sortRows } from '../util/group.js';
 
 /**
  * What the floor actually made.
@@ -61,37 +62,27 @@ export function orderProgress(book, order, orderedMetres) {
 
 /** Metres an hour, by loom, best first. */
 export function loomRates(book) {
-  array(book, 'book');
-  const totals = new Map();
-  for (const entry of book) {
-    const running = totals.get(entry.loom) ?? { loom: entry.loom, metres: 0, hours: 0, stops: 0 };
-    running.metres = roundTo(running.metres + entry.metres, 3);
-    running.hours = roundTo(running.hours + entry.hours, 3);
-    running.stops += entry.stops;
-    totals.set(entry.loom, running);
-  }
-  return [...totals.values()]
-    .map((entry) => ({
-      ...entry,
-      metresPerHour: roundTo(entry.metres / entry.hours, 3),
-      stopsPerHour: roundTo(entry.stops / entry.hours, 3),
-    }))
-    .sort((a, b) => b.metresPerHour - a.metresPerHour || a.loom.localeCompare(b.loom));
+  return rates(book, 'loom', (entry) => entry.loom, { stops: (entry) => entry.stops });
 }
 
 /** The same reading by shift, which is where a night crew shows up. */
 export function shiftRates(book) {
+  return rates(book, 'shift', (entry) => entry.shift);
+}
+
+function rates(book, label, key, extra = {}) {
   array(book, 'book');
-  const totals = new Map();
-  for (const entry of book) {
-    const running = totals.get(entry.shift) ?? { shift: entry.shift, metres: 0, hours: 0 };
-    running.metres = roundTo(running.metres + entry.metres, 3);
-    running.hours = roundTo(running.hours + entry.hours, 3);
-    totals.set(entry.shift, running);
-  }
-  return [...totals.values()]
-    .map((entry) => ({ ...entry, metresPerHour: roundTo(entry.metres / entry.hours, 3) }))
-    .sort((a, b) => b.metresPerHour - a.metresPerHour || a.shift.localeCompare(b.shift));
+  const rows = tally(book, {
+    key,
+    label,
+    fields: { metres: (entry) => entry.metres, hours: (entry) => entry.hours, ...extra },
+  });
+  const withRates = rows.map((row) => {
+    const perHour = { metresPerHour: roundTo(row.metres / row.hours, 3) };
+    if (row.stops !== undefined) perHour.stopsPerHour = roundTo(row.stops / row.hours, 3);
+    return { ...row, ...perHour };
+  });
+  return sortRows(withRates, label, 'metresPerHour');
 }
 
 /**
