@@ -21,7 +21,8 @@
     "format:check": "prettier --check .",
     "coverage": "vitest run --coverage",
     "verify": "node scripts/verify.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "bench": "node scripts/bench.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.19.0",
