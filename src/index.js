@@ -29,6 +29,7 @@ export * as draft from './draft/draft.js';
 export * as ini from './draft/ini.js';
 export * as wif from './draft/wif.js';
 export * as wifWrite from './draft/wifwrite.js';
+export * as transform from './draft/transform.js';
 
 export * as plain from './weave/plain.js';
 export * as twill from './weave/twill.js';
@@ -46,6 +47,7 @@ export * as sett from './analysis/sett.js';
 export * as crimp from './analysis/crimp.js';
 export * as weight from './analysis/weight.js';
 export * as colourorder from './analysis/colourorder.js';
+export * as diff from './analysis/diff.js';
 
 export * as machine from './jacquard/machine.js';
 export * as harness from './jacquard/harness.js';

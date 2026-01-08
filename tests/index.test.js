@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, statSync, readFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as heddlewright from '../src/index.js';
@@ -68,7 +68,12 @@ describe('every source file', () => {
     }
   });
 
-  it('is reachable from the barrel, except the ones that are wiring', async () => {
+  it('is named in the barrel, except the ones that are wiring', () => {
+    // The barrel's own source is read rather than its exported names. Two
+    // modules can export the same name, so a name-based check passes for a
+    // module nobody exported as long as some other module happens to share one
+    // of its names, which is exactly the case this has to catch.
+    const barrel = readFileSync(join(SRC, 'index.js'), 'utf8');
     const wiring = new Set([
       'index.js',
       'cli/parse.js',
@@ -79,17 +84,19 @@ describe('every source file', () => {
       'service/floorroutes.js',
       'service/server.js',
     ]);
-    const exported = new Set(
-      Object.entries(heddlewright)
-        .filter(([name]) => name !== 'VERSION')
-        .flatMap(([, namespace]) => Object.keys(namespace)),
-    );
     for (const file of files) {
       const key = relative(SRC, file).split(sep).join('/');
       if (wiring.has(key)) continue;
-      const loaded = await import(`file://${file.split(sep).join('/')}`);
-      const reachable = Object.keys(loaded).some((name) => exported.has(name));
-      expect(reachable, `${key} is not reachable from the barrel`).toBe(true);
+      expect(barrel, `${key} is not named in the barrel`).toContain(`'./${key}'`);
+    }
+  });
+
+  it('names nothing in the barrel that is not a source file', () => {
+    const barrel = readFileSync(join(SRC, 'index.js'), 'utf8');
+    const named = [...barrel.matchAll(/from '\.\/([^']+)'/g)].map((match) => match[1]);
+    const present = new Set(files.map((file) => relative(SRC, file).split(sep).join('/')));
+    for (const key of named) {
+      expect(present.has(key), `the barrel names ${key}, which is not there`).toBe(true);
     }
   });
 });
