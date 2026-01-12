@@ -57,6 +57,7 @@ export * as lacing from './jacquard/lacing.js';
 export * as cylinder from './jacquard/cylinder.js';
 export * as punch from './jacquard/punch.js';
 export * as estimate from './jacquard/estimate.js';
+export * as deckVerify from './jacquard/verify.js';
 
 export * as dobby from './loom/dobby.js';
 export * as shed from './loom/shed.js';
