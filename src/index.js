@@ -67,6 +67,7 @@ export * as efficiency from './loom/efficiency.js';
 export * as registry from './loom/registry.js';
 
 export * as count from './yarn/count.js';
+export * as yarnPackage from './yarn/package.js';
 export * as reed from './warp/reed.js';
 export * as warping from './warp/warping.js';
 export * as creel from './warp/creel.js';
