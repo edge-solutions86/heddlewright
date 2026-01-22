@@ -65,6 +65,7 @@ export * as takeup from './loom/takeup.js';
 export * as speed from './loom/speed.js';
 export * as efficiency from './loom/efficiency.js';
 export * as registry from './loom/registry.js';
+export * as letoff from './loom/letoff.js';
 
 export * as count from './yarn/count.js';
 export * as yarnPackage from './yarn/package.js';
