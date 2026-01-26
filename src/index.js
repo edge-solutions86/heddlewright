@@ -82,6 +82,7 @@ export * as cutplan from './cloth/cutplan.js';
 export * as orders from './works/orders.js';
 export * as schedule from './works/schedule.js';
 export * as production from './works/production.js';
+export * as costing from './works/costing.js';
 
 export * as journal from './store/journal.js';
 export * as repository from './store/repository.js';
