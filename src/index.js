@@ -40,6 +40,7 @@ export * as blocks from './weave/blocks.js';
 export * as overshot from './weave/overshot.js';
 export * as summerWinter from './weave/summerwinter.js';
 export * as leno from './weave/leno.js';
+export * as doublecloth from './weave/doublecloth.js';
 export * as catalogue from './weave/catalogue.js';
 
 export * as floats from './analysis/floats.js';
