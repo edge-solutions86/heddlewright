@@ -30,6 +30,7 @@ export * as ini from './draft/ini.js';
 export * as wif from './draft/wif.js';
 export * as wifWrite from './draft/wifwrite.js';
 export * as transform from './draft/transform.js';
+export * as equivalence from './draft/equivalence.js';
 
 export * as plain from './weave/plain.js';
 export * as twill from './weave/twill.js';
