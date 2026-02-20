@@ -81,6 +81,7 @@ export * as fourpoint from './cloth/fourpoint.js';
 export * as inspection from './cloth/inspection.js';
 export * as roll from './cloth/roll.js';
 export * as cutplan from './cloth/cutplan.js';
+export * as lot from './cloth/lot.js';
 
 export * as orders from './works/orders.js';
 export * as schedule from './works/schedule.js';
