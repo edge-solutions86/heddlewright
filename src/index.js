@@ -91,6 +91,7 @@ export * as despatch from './works/despatch.js';
 
 export * as journal from './store/journal.js';
 export * as repository from './store/repository.js';
+export * as snapshot from './store/snapshot.js';
 
 export * as router from './service/router.js';
 export * as app from './service/app.js';
