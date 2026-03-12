@@ -19,6 +19,7 @@ export * as table from './util/table.js';
 export * as range from './util/range.js';
 export * as indexing from './util/indexing.js';
 export * as group from './util/group.js';
+export * as dates from './util/dates.js';
 
 export * as threading from './draft/threading.js';
 export * as tieup from './draft/tieup.js';
