@@ -73,6 +73,7 @@ export * as letoff from './loom/letoff.js';
 
 export * as count from './yarn/count.js';
 export * as yarnPackage from './yarn/package.js';
+export * as blend from './yarn/blend.js';
 export * as reed from './warp/reed.js';
 export * as warping from './warp/warping.js';
 export * as creel from './warp/creel.js';
