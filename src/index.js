@@ -78,6 +78,7 @@ export * as reed from './warp/reed.js';
 export * as warping from './warp/warping.js';
 export * as creel from './warp/creel.js';
 export * as beam from './warp/beam.js';
+export * as heddles from './warp/heddles.js';
 
 export * as fourpoint from './cloth/fourpoint.js';
 export * as inspection from './cloth/inspection.js';
