@@ -53,6 +53,7 @@ export * as weight from './analysis/weight.js';
 export * as colourorder from './analysis/colourorder.js';
 export * as diff from './analysis/diff.js';
 export * as motif from './analysis/motif.js';
+export * as report from './analysis/report.js';
 
 export * as machine from './jacquard/machine.js';
 export * as harness from './jacquard/harness.js';
