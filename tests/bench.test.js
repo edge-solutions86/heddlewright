@@ -51,8 +51,12 @@ describe('benchmarks', () => {
 });
 
 describe('runBenchmarks', () => {
+  // Run once and share the results. Each benchmark weaves a two hundred by two
+  // hundred cloth several times over, so running the whole set once per test
+  // put this file past the default timeout on a loaded machine.
+  const results = runBenchmarks();
+
   it('runs every one and reports a timing', () => {
-    const results = runBenchmarks();
     expect(results.length).toBe(benchmarks().length);
     for (const result of results) {
       expect(result.rounds).toBeGreaterThan(0);
@@ -61,9 +65,15 @@ describe('runBenchmarks', () => {
   });
 
   it('does its work rather than reporting an empty round', () => {
-    for (const result of runBenchmarks()) {
+    for (const result of results) {
       expect(result.last).toBeDefined();
     }
+  });
+
+  it('names every benchmark in its result', () => {
+    expect(results.map((result) => result.name)).toEqual(
+      benchmarks().map((benchmark) => benchmark.name),
+    );
   });
 
   it('does not run itself on import', () => {
