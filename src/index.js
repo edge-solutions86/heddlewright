@@ -88,6 +88,7 @@ export * as inspection from './cloth/inspection.js';
 export * as roll from './cloth/roll.js';
 export * as cutplan from './cloth/cutplan.js';
 export * as lot from './cloth/lot.js';
+export * as finishing from './cloth/finishing.js';
 
 export * as orders from './works/orders.js';
 export * as schedule from './works/schedule.js';
