@@ -104,6 +104,7 @@ export * as snapshot from './store/snapshot.js';
 
 export * as router from './service/router.js';
 export * as app from './service/app.js';
+export * as middleware from './service/middleware.js';
 
 /** The package version, kept beside the surface it describes. */
 export const VERSION = '0.1.0';
