@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { NotFound, InvalidArgument } from '../../src/util/errors.js';
 import { plainWeave } from '../../src/weave/plain.js';
+import { diagonalScore } from '../../src/weave/crepe.js';
 import {
   listWeaves,
   families,
@@ -31,9 +32,22 @@ describe('listWeaves', () => {
   });
 
   it('groups into the families the report uses', () => {
-    expect(families()).toEqual(['figured', 'plain', 'satin', 'twill']);
+    expect(families()).toEqual(['block', 'crepe', 'figured', 'plain', 'satin', 'twill']);
     expect(weavesInFamily('satin').length).toBe(3);
     expect(weavesInFamily('nothing')).toEqual([]);
+  });
+
+  it('carries the block weaves as woven cloth rather than as drafts', () => {
+    const overshot = measure('overshot ABCD');
+    expect(overshot.picks).toBe(16);
+    expect(overshot.ends).toBe(16);
+    expect(overshot.warpFace).toBe(0.5);
+  });
+
+  it('carries the crepes, and reads them as having no long line', () => {
+    for (const weave of weavesInFamily('crepe')) {
+      expect(measure(weave.name).longestFloat).toBeLessThanOrEqual(3);
+    }
   });
 });
 
@@ -104,6 +118,42 @@ describe('measureAll', () => {
   });
 });
 
+describe('the families', () => {
+  it('puts every weave in exactly one family', () => {
+    const byName = new Map();
+    for (const weave of listWeaves()) {
+      expect(byName.has(weave.name)).toBe(false);
+      byName.set(weave.name, weave.family);
+    }
+    expect(byName.size).toBe(listWeaves().length);
+  });
+
+  it('has every family holding at least one weave', () => {
+    for (const family of families()) {
+      expect(weavesInFamily(family).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('accounts for every weave across the families', () => {
+    const counted = families().reduce((total, family) => total + weavesInFamily(family).length, 0);
+    expect(counted).toBe(listWeaves().length);
+  });
+
+  it('reads the figured family as long floating', () => {
+    for (const weave of weavesInFamily('figured')) {
+      expect(measure(weave.name).longestFloat).toBeGreaterThan(2);
+    }
+  });
+
+  it('reads the block family as balanced cloth', () => {
+    for (const weave of weavesInFamily('block')) {
+      const reading = measure(weave.name);
+      expect(reading.warpFace).toBeGreaterThan(0.4);
+      expect(reading.warpFace).toBeLessThan(0.6);
+    }
+  });
+});
+
 describe('weavesWithin', () => {
   it('keeps only the weaves inside a float limit, firmest first', () => {
     const found = weavesWithin(2);
@@ -136,5 +186,51 @@ describe('addWeave and removeWeave', () => {
   it('refuses an entry with no builder', () => {
     expect(() => addWeave({ name: 'shed special', family: 'plain' })).toThrow(NotFound);
     expect(() => addWeave({ name: '', family: 'plain', build: () => [] })).toThrow(InvalidArgument);
+  });
+});
+
+describe('the new families read as their own kind of cloth', () => {
+  it('reads the crepes as scattered rather than as lines', () => {
+    // A crepe that scored a diagonal would be a twill wearing a crepe's name,
+    // which is the one thing that can go wrong when a crepe is built by
+    // overlaying weaves, so it is checked here rather than trusted.
+    for (const weave of weavesInFamily('crepe')) {
+      const cloth = weaveByName(weave.name);
+      expect(diagonalScore(cloth)).toBeLessThan(1);
+    }
+  });
+
+  it('reads mock leno as an open cloth beside a plain one', () => {
+    const leno = measure('mock leno 3');
+    const plain = measure('plain');
+    expect(leno.longestFloat).toBeGreaterThan(plain.longestFloat);
+    expect(leno.firmness).not.toBe(plain.firmness);
+  });
+
+  it('builds every block weave on an even number of ends and picks', () => {
+    // Blocks come in pairs, so neither side of the repeat can be odd. Summer
+    // and winter is 12 by 24 rather than square, which is why the check is on
+    // the parity and not on the two being equal.
+    for (const weave of weavesInFamily('block')) {
+      const cloth = weaveByName(weave.name);
+      expect(cloth.length % 2).toBe(0);
+      expect(cloth[0].length % 2).toBe(0);
+    }
+  });
+
+  it('sorts the short floating weaves firmest first', () => {
+    const within = weavesWithin(3);
+    expect(within[0].name).toBe('plain');
+    for (const row of within) expect(row.longestFloat).toBeLessThanOrEqual(3);
+    for (let i = 1; i < within.length; i += 1) {
+      expect(within[i - 1].interlacement).toBeGreaterThanOrEqual(within[i].interlacement);
+    }
+  });
+
+  it('takes the crepes and mock leno in under that limit, and leaves satin out', () => {
+    const names = weavesWithin(3).map((row) => row.name);
+    expect(names).toContain('crepe 8');
+    expect(names).toContain('mock leno 2');
+    expect(names.some((name) => name.startsWith('satin'))).toBe(false);
   });
 });

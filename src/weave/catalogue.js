@@ -8,6 +8,12 @@ import { plainWeave, basketWeave, warpRib, weftRib } from './plain.js';
 import { twillWeave, brokenTwill, pointedTwill } from './twill.js';
 import { satinWeave } from './satin.js';
 import { honeycombWeave } from './honeycomb.js';
+import { mockLeno } from './leno.js';
+import { satinCrepe, rearrangedCrepe } from './crepe.js';
+import { overshotDraft } from './overshot.js';
+import { summerWinterDraft } from './summerwinter.js';
+import { createDraft } from '../draft/draft.js';
+import { drawdownFromDraft } from '../draft/drawdown.js';
 
 /**
  * The catalogue.
@@ -40,6 +46,19 @@ define('satin 8', 'satin', () => satinWeave(8, 3));
 define('sateen 5', 'satin', () => satinWeave(5, 2, { face: 'weft' }));
 define('honeycomb 5', 'figured', () => honeycombWeave(5));
 define('honeycomb 7', 'figured', () => honeycombWeave(7));
+define('mock leno 2', 'figured', () => mockLeno(2));
+define('mock leno 3', 'figured', () => mockLeno(3));
+define('crepe 8', 'crepe', () => satinCrepe({ threads: 8 }));
+define('crepe rearranged', 'crepe', () =>
+  rearrangedCrepe(twillWeave('2/2', { picks: 8, ends: 8 })),
+);
+define('overshot ABCD', 'block', () => woven(overshotDraft(['A', 'B', 'C', 'D'], { units: 2 })));
+define('summer and winter 121', 'block', () => woven(summerWinterDraft([1, 2, 1], { units: 2 })));
+
+/** Weave a draft and hand back the cloth, for the entries that are drafts. */
+function woven(draft) {
+  return drawdownFromDraft(createDraft(draft));
+}
 
 /** Every weave in the catalogue, in name order. */
 export function listWeaves() {

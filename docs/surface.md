@@ -53,22 +53,28 @@ weave    print one repeat of a named weave
 ## Weaves
 
 ```
-name              family   repeat  warp face  longest float  firmness
-----------------  -------  ------  ---------  -------------  --------
-basket 2/2        plain    4x4           0.5              2  medium
-basket 3/3        plain    6x6           0.5              3  open
-broken twill 2/2  twill    4x4           0.5              2  medium
-herringbone 2/2   twill    4x6           0.5              3  medium
-honeycomb 5       figured  8x8        0.3906              8  loose
-honeycomb 7       figured  12x12      0.4236             12  loose
-plain             plain    2x2           0.5              1  firm
-sateen 5          satin    5x5           0.2              4  open
-satin 5           satin    5x5           0.8              4  open
-satin 8           satin    8x8         0.875              7  open
-twill 1/3         twill    4x4          0.25              3  medium
-twill 2/1/1/2     twill    6x6           0.5              2  medium
-twill 2/2         twill    4x4           0.5              2  medium
-twill 3/1         twill    4x4          0.75              3  medium
-warp rib          plain    4x2           0.5              2  medium
-weft rib          plain    2x4           0.5              2  medium
+name                   family   repeat  warp face  longest float  firmness
+---------------------  -------  ------  ---------  -------------  --------
+basket 2/2             plain    4x4           0.5              2  medium
+basket 3/3             plain    6x6           0.5              3  open
+broken twill 2/2       twill    4x4           0.5              2  medium
+crepe 8                crepe    8x8           0.5              3  medium
+crepe rearranged       crepe    8x8           0.5              2  medium
+herringbone 2/2        twill    4x6           0.5              3  medium
+honeycomb 5            figured  8x8        0.3906              8  loose
+honeycomb 7            figured  12x12      0.4236             12  loose
+mock leno 2            figured  4x4          0.75              3  medium
+mock leno 3            figured  6x6        0.7222              5  medium
+overshot ABCD          block    16x16         0.5              6  medium
+plain                  plain    2x2           0.5              1  firm
+sateen 5               satin    5x5           0.2              4  open
+satin 5                satin    5x5           0.8              4  open
+satin 8                satin    8x8         0.875              7  open
+summer and winter 121  block    12x24      0.5278              8  medium
+twill 1/3              twill    4x4          0.25              3  medium
+twill 2/1/1/2          twill    6x6           0.5              2  medium
+twill 2/2              twill    4x4           0.5              2  medium
+twill 3/1              twill    4x4          0.75              3  medium
+warp rib               plain    4x2           0.5              2  medium
+weft rib               plain    2x4           0.5              2  medium
 ```
