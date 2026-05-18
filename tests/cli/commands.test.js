@@ -145,6 +145,64 @@ describe('the check command', () => {
   });
 });
 
+describe('the report command', () => {
+  it('prints every section of the cloth report', () => {
+    const text = run(['report', '--shafts', '4', '--ends', '8', '--picks', '8']);
+    expect(text).toContain('Structure');
+    expect(text).toContain('Floats');
+    expect(text).toContain('Sett');
+  });
+
+  it('reads the repeat out of the drawn cloth', () => {
+    const text = run(['report', '--shafts', '4', '--ends', '16', '--picks', '16']);
+    expect(text).toMatch(/repeatEnds\s*:\s*4/);
+  });
+
+  it('takes a float limit and a yarn count', () => {
+    const text = run(['report', '--floatLimit', '1', '--count', '40']);
+    expect(text).toMatch(/floatLimit\s*:\s*1/);
+  });
+});
+
+describe('the catalogue command', () => {
+  it('lists every weave measured', () => {
+    const text = run(['catalogue']);
+    expect(text).toContain('plain');
+    expect(text).toContain('satin 8');
+    expect(text).toContain('warp face');
+  });
+
+  it('filters to one family', () => {
+    const text = run(['catalogue', '--family', 'satin']);
+    expect(text).toContain('satin 5');
+    expect(text).not.toContain('plain ');
+  });
+
+  it('says which families there are when it finds none', () => {
+    const text = run(['catalogue', '--family', 'gauze']);
+    expect(text).toContain('families:');
+  });
+});
+
+describe('the deck command', () => {
+  it('cuts a deck for a named weave and prices it', () => {
+    const text = run(['deck', '--weave', 'twill 2/2']);
+    expect(text).toContain('machine');
+    expect(text).toMatch(/cards\s*:\s*4/);
+    expect(text).toMatch(/poundsAndPence\s*:\s*0\./);
+  });
+
+  it('repeats the weave when asked', () => {
+    const text = run(['deck', '--weave', 'twill 2/2', '--repeats', '3']);
+    expect(text).toMatch(/cards\s*:\s*12/);
+    expect(text).toMatch(/repeat\s*:\s*4/);
+  });
+
+  it('refuses a weave the catalogue does not have', () => {
+    expect(() => run(['deck', '--weave', 'gauze'])).toThrow();
+  });
+});
+
 describe('usage', () => {
   it('describes one command from the same spec the parser checks', () => {
     const text = commandUsage('count');
