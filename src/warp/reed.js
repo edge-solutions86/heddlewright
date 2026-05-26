@@ -1,6 +1,6 @@
-import { DraftError } from '../util/errors.js';
 import { array, positiveInteger, positiveNumber } from '../util/check.js';
 import { roundTo, sum } from '../util/numeric.js';
+import { assertFits } from '../util/limits.js';
 
 /**
  * The reed and the denting plan.
@@ -127,11 +127,10 @@ export function dentingWarnings(dents, { maxEndsPerDent = 4 } = {}) {
 export function assertDentingFits(dents, dentsAvailable) {
   array(dents, 'dents', { min: 1 });
   positiveInteger(dentsAvailable, 'dentsAvailable');
-  if (dents.length > dentsAvailable) {
-    throw new DraftError('the denting needs more dents than the reed has', {
-      needed: dents.length,
-      dentsAvailable,
-    });
-  }
+  assertFits(dents.length, dentsAvailable, {
+    what: 'denting',
+    has: 'the denting needs more dents than the reed has',
+    detail: { needed: dents.length, dentsAvailable },
+  });
   return dents;
 }

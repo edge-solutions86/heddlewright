@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DraftError, InvalidArgument } from '../../src/util/errors.js';
+import { CapacityError, InvalidArgument } from '../../src/util/errors.js';
 import {
   STOCK_REEDS,
   reedFor,
@@ -151,8 +151,11 @@ describe('assertDentingFits', () => {
       assertDentingFits([2, 2, 2], 2);
       throw new Error('should have thrown');
     } catch (err) {
-      expect(err).toBeInstanceOf(DraftError);
-      expect(err.detail).toEqual({ needed: 3, dentsAvailable: 2 });
+      // A reed that is too small is a capacity problem rather than a fault in
+      // the draft, and it reports the shortfall the same way every other
+      // capacity check does.
+      expect(err).toBeInstanceOf(CapacityError);
+      expect(err.detail).toMatchObject({ needed: 3, dentsAvailable: 2, over: 1 });
     }
   });
 });

@@ -2,6 +2,7 @@ import { CapacityError, InvalidArgument } from '../util/errors.js';
 import { array, positiveInteger, positiveNumber } from '../util/check.js';
 import { roundTo } from '../util/numeric.js';
 import { shaftLoad } from '../draft/threading.js';
+import { shortfalls, worstShortfall } from '../util/limits.js';
 
 /**
  * Heddles and drawing in.
@@ -22,14 +23,15 @@ export function heddlesNeeded(threading, shafts) {
 export function heddleShortfalls(threading, { shafts, available }) {
   const needed = heddlesNeeded(threading, shafts);
   array(available, 'available', { min: shafts, max: shafts });
-  return needed
-    .map((count, index) => ({
-      shaft: index + 1,
-      needed: count,
-      available: positiveInteger(available[index], `available[${index}]`),
-    }))
-    .filter((entry) => entry.needed > entry.available)
-    .map((entry) => ({ ...entry, short: entry.needed - entry.available }));
+  for (const [index, count] of available.entries()) {
+    positiveInteger(count, `available[${index}]`);
+  }
+  return shortfalls(needed, available, { label: 'shaft' }).map((entry) => ({
+    shaft: entry.shaft,
+    needed: entry.wanted,
+    available: entry.available,
+    short: entry.over,
+  }));
 }
 
 /** Refuse a draft the loom has not the heddles for. */
@@ -38,7 +40,7 @@ export function assertHeddlesFit(threading, options) {
   if (short.length > 0) {
     throw new CapacityError('there are not enough heddles on every shaft', {
       shafts: short.length,
-      worst: short.reduce((best, entry) => (entry.short > best.short ? entry : best), short[0]),
+      worst: worstShortfall(short.map((entry) => ({ ...entry, over: entry.short }))),
     });
   }
   return threading;

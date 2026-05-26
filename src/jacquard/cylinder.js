@@ -1,6 +1,7 @@
-import { CapacityError, InvalidArgument } from '../util/errors.js';
+import { InvalidArgument } from '../util/errors.js';
 import { integer, oneOf, positiveInteger, positiveNumber } from '../util/check.js';
 import { mod, roundTo } from '../util/numeric.js';
+import { assertFits } from '../util/limits.js';
 
 /**
  * The cylinder, and how the chain runs over it.
@@ -75,13 +76,11 @@ export function chainRevolutions(picks, cards) {
 export function assertChainFits(cards, { railCapacity }) {
   positiveInteger(cards, 'cards');
   positiveInteger(railCapacity, 'railCapacity');
-  if (cards > railCapacity) {
-    throw new CapacityError('the chain is longer than the rail will carry', {
-      cards,
-      railCapacity,
-      over: cards - railCapacity,
-    });
-  }
+  assertFits(cards, railCapacity, {
+    what: 'chain',
+    has: 'the chain is longer than the rail will carry',
+    detail: { cards, railCapacity },
+  });
   return cards;
 }
 

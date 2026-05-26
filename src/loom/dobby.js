@@ -3,6 +3,7 @@ import { array, integer, oneOf, positiveInteger } from '../util/check.js';
 import { assertMatrix, createMatrix, formatMatrix } from '../util/matrix.js';
 import { setPositions, duplicateGroups } from '../util/indexing.js';
 import { period, canonicalRotation } from '../util/cycle.js';
+import { assertFits } from '../util/limits.js';
 
 /**
  * The dobby chain.
@@ -100,13 +101,11 @@ export function repeatedLags(chain) {
 export function assertChainFitsBarrel(chain, { lagCapacity }) {
   assertMatrix(chain, 'chain');
   positiveInteger(lagCapacity, 'lagCapacity');
-  if (chain.length > lagCapacity) {
-    throw new CapacityError('the chain is longer than the barrel holds', {
-      lags: chain.length,
-      lagCapacity,
-      over: chain.length - lagCapacity,
-    });
-  }
+  assertFits(chain.length, lagCapacity, {
+    what: 'chain',
+    has: 'the chain is longer than the barrel holds',
+    detail: { lags: chain.length, lagCapacity },
+  });
   return chain;
 }
 
