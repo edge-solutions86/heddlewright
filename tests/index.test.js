@@ -82,6 +82,7 @@ describe('every source file', () => {
       'service/draftroutes.js',
       'service/clothroutes.js',
       'service/floorroutes.js',
+      'service/weaveroutes.js',
       'service/server.js',
     ]);
     for (const file of files) {

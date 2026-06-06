@@ -4,6 +4,7 @@ import { createJournal, head, length, verify } from '../store/journal.js';
 import { mountDraftRoutes } from './draftroutes.js';
 import { mountClothRoutes } from './clothroutes.js';
 import { mountFloorRoutes } from './floorroutes.js';
+import { mountWeaveRoutes } from './weaveroutes.js';
 
 /**
  * The whole service in one object.
@@ -43,6 +44,7 @@ export function createApp({ journal = createJournal() } = {}) {
   mountDraftRoutes(router, repository);
   mountClothRoutes(router, repository);
   mountFloorRoutes(router, repository);
+  mountWeaveRoutes(router);
 
   return { router, repository, request: (request) => handle(router, request) };
 }
