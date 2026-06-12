@@ -2,17 +2,51 @@ import { describe, it, expect } from 'vitest';
 import { NotFound, InvalidArgument } from '../../src/util/errors.js';
 import { parseArgs } from '../../src/cli/parse.js';
 import {
+  DRAW_OPTIONS,
   buildDraft,
   listCommands,
   commandByName,
   commandUsage,
   toolUsage,
+  specOf,
 } from '../../src/cli/commands.js';
+import { DRAW_COMMANDS } from '../../src/cli/draw.js';
+import { SHOP_COMMANDS } from '../../src/cli/shop.js';
 
 function run(argv) {
   const parsed = parseArgs(argv);
   return commandByName(parsed.command).run(parsed);
 }
+
+describe('the register', () => {
+  it('is filled by loading the command files rather than by a list here', () => {
+    expect(listCommands().length).toBeGreaterThan(8);
+  });
+
+  it('holds exactly what the two files say they put in it', () => {
+    const declared = [...DRAW_COMMANDS, ...SHOP_COMMANDS].sort();
+    expect(listCommands().map((command) => command.name)).toEqual(declared);
+  });
+
+  it('holds no command twice', () => {
+    const names = listCommands().map((command) => command.name);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  it('gives every command a spec the parser can check against', () => {
+    for (const command of listCommands()) {
+      expect(specOf(command.name)).toBe(command.spec);
+    }
+  });
+
+  it('shares one option set across the drawing commands', () => {
+    for (const name of ['draft', 'floats', 'check', 'report']) {
+      for (const option of Object.keys(DRAW_OPTIONS)) {
+        expect(specOf(name)).toHaveProperty(option);
+      }
+    }
+  });
+});
 
 describe('listCommands', () => {
   it('lists them in name order with a summary each', () => {
