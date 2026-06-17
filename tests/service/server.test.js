@@ -101,6 +101,26 @@ describe('the running server', () => {
     expect(response.status).toBe(404);
   });
 
+  it('answers a wrong method with four hundred and five and what is allowed', async () => {
+    const base = await start();
+    const response = await fetch(`${base}/health`, { method: 'DELETE' });
+    expect(response.status).toBe(405);
+    expect((await response.json()).allowed).toEqual(['GET']);
+  });
+
+  it('answers a wrong method on a stored record the same way', async () => {
+    const base = await start();
+    const created = await fetch(`${base}/drafts`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(DRAFT),
+    });
+    const { id } = await created.json();
+    const response = await fetch(`${base}/drafts/${id}`, { method: 'PUT' });
+    expect(response.status).toBe(405);
+    expect((await response.json()).allowed).toEqual(['DELETE', 'GET']);
+  });
+
   it('sends a content length that matches the body', async () => {
     const base = await start();
     const response = await fetch(`${base}/health`);

@@ -58,6 +58,25 @@ export function match(router, method, path) {
   return null;
 }
 
+/**
+ * The methods that would have matched this path, which is how a four hundred
+ * and five is told apart from a four hundred and four. A path nobody declared
+ * is missing; a path declared for another method is a wrong method, and the two
+ * want different things from the caller.
+ */
+export function methodsFor(router, path) {
+  const wanted = splitPath(path);
+  const found = new Set();
+  for (const entry of router.routes) {
+    if (entry.segments.length !== wanted.length) continue;
+    const fits = entry.segments.every(
+      (segment, index) => segment.startsWith(':') || segment === wanted[index],
+    );
+    if (fits) found.add(entry.method);
+  }
+  return [...found].sort();
+}
+
 /** The paths a method can reach, for a not-found body worth reading. */
 export function pathsFor(router, method) {
   return router.routes
@@ -77,6 +96,13 @@ export async function handle(router, request) {
   const path = nonEmptyString(request.path, 'request.path');
   const found = match(router, method, path);
   if (found === null) {
+    const allowed = methodsFor(router, path);
+    if (allowed.length > 0) {
+      return {
+        status: 405,
+        body: { error: 'wrong method', method, path, allowed },
+      };
+    }
     return {
       status: 404,
       body: { error: 'no route', method, path, known: pathsFor(router, method) },

@@ -5,6 +5,7 @@ import {
   createRouter,
   route,
   match,
+  methodsFor,
   pathsFor,
   handle,
   errorResponse,
@@ -95,6 +96,22 @@ describe('handle', () => {
     expect(response.body.known).toContain('/drafts');
   });
 
+  it('tells a wrong method apart from a missing path', async () => {
+    const response = await handle(router, { method: 'DELETE', path: '/drafts' });
+    expect(response.status).toBe(405);
+    expect(response.body.allowed).toEqual(['GET', 'POST']);
+  });
+
+  it('still answers four hundred and four when nothing declares the path', async () => {
+    expect((await handle(router, { method: 'DELETE', path: '/looms' })).status).toBe(404);
+  });
+
+  it('reads a wrong method on a parameter path too', async () => {
+    const response = await handle(router, { method: 'POST', path: '/drafts/d7' });
+    expect(response.status).toBe(405);
+    expect(response.body.allowed).toEqual(['GET']);
+  });
+
   it('defaults the method to GET', async () => {
     expect((await handle(router, { path: '/drafts' })).status).toBe(200);
   });
@@ -136,6 +153,23 @@ describe('errorResponse', () => {
       throw new NotFound('nothing here');
     });
     expect((await handle(router, { path: '/x' })).status).toBe(404);
+  });
+});
+
+describe('methodsFor', () => {
+  const router = built();
+
+  it('names every method declared for a path', () => {
+    expect(methodsFor(router, '/drafts')).toEqual(['GET', 'POST']);
+    expect(methodsFor(router, '/drafts/d7')).toEqual(['GET']);
+  });
+
+  it('is empty for a path nobody declared', () => {
+    expect(methodsFor(router, '/looms')).toEqual([]);
+  });
+
+  it('does not let a parameter path answer for a longer one', () => {
+    expect(methodsFor(router, '/drafts/d7/nothing')).toEqual([]);
   });
 });
 

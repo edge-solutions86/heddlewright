@@ -62,6 +62,12 @@ describe('the route table', () => {
     expect(response.body.length).toBe(routeTable(app).length);
   });
 
+  it('answers a wrong method with the methods that path does take', async () => {
+    const response = await app.request({ method: 'POST', path: '/health' });
+    expect(response.status).toBe(405);
+    expect(response.body.allowed).toEqual(['GET']);
+  });
+
   it('answers a path nobody declared with the ones it knows', async () => {
     const response = await app.request({ path: '/nothing' });
     expect(response.status).toBe(404);
