@@ -16,14 +16,9 @@ import {
   distinctCloths,
 } from '../../src/draft/equivalence.js';
 
-const TWILL = createDraft({
-  name: 'twill',
-  shafts: 4,
-  treadles: 4,
-  threading: straightDraw(4, 8),
-  tieup: twillTieup(4, 2),
-  treadling: straightTreadling(4, 8),
-});
+import { twillDraft } from '../fixtures.js';
+
+const TWILL = twillDraft({ name: 'twill' });
 
 const RENUMBERED = createDraft({
   name: 'twill renumbered',

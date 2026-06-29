@@ -1,18 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { straightDraw } from '../../src/draft/threading.js';
-import { twillTieup } from '../../src/draft/tieup.js';
-import { straightTreadling } from '../../src/draft/treadling.js';
 import { createRouter, handle } from '../../src/service/router.js';
 import { mountWeaveRoutes, weaveNames } from '../../src/service/weaveroutes.js';
 
-const DRAFT = {
-  name: 'four shaft twill',
-  shafts: 4,
-  treadles: 4,
-  threading: straightDraw(4, 16),
-  tieup: twillTieup(4, 2),
-  treadling: straightTreadling(4, 16),
-};
+import { twillRecord } from '../fixtures.js';
+
+const DRAFT = twillRecord({ ends: 16, picks: 16 });
 
 let router;
 

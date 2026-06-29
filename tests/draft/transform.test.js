@@ -3,9 +3,7 @@ import { DraftError, InvalidArgument } from '../../src/util/errors.js';
 import { formatMatrix } from '../../src/util/matrix.js';
 import { createDraft } from '../../src/draft/draft.js';
 import { drawdownFromDraft } from '../../src/draft/drawdown.js';
-import { straightDraw } from '../../src/draft/threading.js';
 import { twillTieup } from '../../src/draft/tieup.js';
-import { straightTreadling } from '../../src/draft/treadling.js';
 import {
   DIRECTIONS,
   mirrorThreading,
@@ -19,14 +17,9 @@ import {
   compactShafts,
 } from '../../src/draft/transform.js';
 
-const TWILL = {
-  name: 'twill',
-  shafts: 4,
-  treadles: 4,
-  threading: straightDraw(4, 8),
-  tieup: twillTieup(4, 2),
-  treadling: straightTreadling(4, 8),
-};
+import { twillRecord } from '../fixtures.js';
+
+const TWILL = twillRecord({ name: 'twill' });
 
 describe('mirroring', () => {
   it('reverses the threading', () => {

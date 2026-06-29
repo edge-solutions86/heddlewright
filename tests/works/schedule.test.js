@@ -14,21 +14,11 @@ import {
   assertRunComplete,
 } from '../../src/works/schedule.js';
 
-const NARROW = createLoom({
-  reference: 'N1',
-  shedding: 'dobby',
-  reedWidthCm: 120,
-  shafts: 8,
-  picksMinute: 200,
-});
+import { narrowLoom, wideLoom } from '../fixtures.js';
 
-const WIDE = createLoom({
-  reference: 'W1',
-  shedding: 'dobby',
-  reedWidthCm: 260,
-  shafts: 16,
-  picksMinute: 200,
-});
+const NARROW = createLoom(narrowLoom());
+
+const WIDE = createLoom(wideLoom());
 
 const LOOMS = [WIDE, NARROW];
 

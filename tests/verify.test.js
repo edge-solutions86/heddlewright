@@ -80,6 +80,11 @@ describe('checkTestsPaired', () => {
   it('counts the test files it walked', () => {
     expect(checkTestsPaired().files).toBeGreaterThan(40);
   });
+
+  it('lets a shared fixture under tests stand as its own pair', () => {
+    // fixtures.test.js has no src/fixtures.js and is not meant to have one.
+    expect(checkTestsPaired().problems.join(' ')).not.toContain('fixtures.js');
+  });
 });
 
 describe('checkScriptGuards', () => {

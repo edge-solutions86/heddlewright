@@ -3,31 +3,13 @@ import { createRouter, handle } from '../../src/service/router.js';
 import { createRepository } from '../../src/store/repository.js';
 import { mountFloorRoutes, loomRecords, outturnBook } from '../../src/service/floorroutes.js';
 
-const NARROW = {
-  reference: 'N1',
-  shedding: 'dobby',
-  reedWidthCm: 120,
-  shafts: 8,
-  picksMinute: 200,
-};
+import { narrowLoom, wideLoom, poplinOrder } from '../fixtures.js';
 
-const WIDE = {
-  reference: 'W1',
-  shedding: 'dobby',
-  reedWidthCm: 260,
-  shafts: 16,
-  picksMinute: 180,
-};
+const NARROW = narrowLoom();
 
-const ORDER = {
-  reference: 'SO-1',
-  customer: 'Ravensward',
-  style: 'poplin',
-  metres: 400,
-  widthCm: 100,
-  pricePerMetre: 5,
-  wantedBy: '2025-10-01',
-};
+const WIDE = wideLoom({ picksMinute: 180 });
+
+const ORDER = poplinOrder();
 
 const RUN = {
   order: 'SO-1',

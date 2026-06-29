@@ -97,6 +97,11 @@ export function checkTestsPaired() {
     ...walk(join(ROOT, 'scripts'), ['.mjs']).map((file) =>
       relative(join(ROOT, 'scripts'), file).split(sep).join('/').replace('.mjs', '.js'),
     ),
+    // The shared fixtures live under tests and are tested there, so they pair
+    // with themselves rather than with anything in src.
+    ...walk(join(ROOT, 'tests'), ['.js'])
+      .filter((file) => !file.endsWith('.test.js'))
+      .map((file) => relative(join(ROOT, 'tests'), file).split(sep).join('/')),
   ]);
   const tests = walk(join(ROOT, 'tests'), ['.test.js']);
   const problems = [];

@@ -1,18 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { straightDraw } from '../../src/draft/threading.js';
-import { twillTieup } from '../../src/draft/tieup.js';
-import { straightTreadling } from '../../src/draft/treadling.js';
 import { createJournal, toJson, fromJson } from '../../src/store/journal.js';
 import { createApp, routeTable, duplicateRoutes, VERSION } from '../../src/service/app.js';
 
-const DRAFT = {
-  name: 'four shaft twill',
-  shafts: 4,
-  treadles: 4,
-  threading: straightDraw(4, 8),
-  tieup: twillTieup(4, 2),
-  treadling: straightTreadling(4, 8),
-};
+import { twillRecord } from '../fixtures.js';
+
+const DRAFT = twillRecord();
 
 let app;
 

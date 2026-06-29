@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { InvalidArgument } from '../../src/util/errors.js';
 import { createDraft } from '../../src/draft/draft.js';
-import { straightDraw } from '../../src/draft/threading.js';
 import { twillTieup } from '../../src/draft/tieup.js';
-import { straightTreadling } from '../../src/draft/treadling.js';
 import {
   structureSection,
   floatSection,
@@ -14,22 +12,11 @@ import {
   meetsSpecification,
 } from '../../src/analysis/report.js';
 
-const DRAFT = createDraft({
-  name: 'four shaft twill',
-  shafts: 4,
-  treadles: 4,
-  threading: straightDraw(4, 16),
-  tieup: twillTieup(4, 2),
-  treadling: straightTreadling(4, 16),
-});
+import { twillDraft, shirtingConstruction } from '../fixtures.js';
 
-const CONSTRUCTION = {
-  endsPerCm: 24,
-  picksPerCm: 20,
-  warpCount: 20,
-  weftCount: 20,
-  system: 'tex',
-};
+const DRAFT = twillDraft({ ends: 16, picks: 16 });
+
+const CONSTRUCTION = shirtingConstruction();
 
 const OPTIONS = {
   count: 30,

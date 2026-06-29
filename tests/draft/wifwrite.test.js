@@ -1,9 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { InvalidArgument } from '../../src/util/errors.js';
 import { formatMatrix } from '../../src/util/matrix.js';
-import { straightDraw } from '../../src/draft/threading.js';
-import { twillTieup } from '../../src/draft/tieup.js';
-import { straightTreadling } from '../../src/draft/treadling.js';
 import { createDraft } from '../../src/draft/draft.js';
 import { drawdownFromDraft } from '../../src/draft/drawdown.js';
 import { liftplanFromTreadling } from '../../src/draft/liftplan.js';
@@ -11,14 +8,9 @@ import { parseIni } from '../../src/draft/ini.js';
 import { draftFromWif, readWif, declaresAndCarries } from '../../src/draft/wif.js';
 import { writeWif, writeDobbyWif, contentsFor } from '../../src/draft/wifwrite.js';
 
-const DRAFT = createDraft({
-  name: 'four shaft twill',
-  shafts: 4,
-  treadles: 4,
-  threading: straightDraw(4, 8),
-  tieup: twillTieup(4, 2),
-  treadling: straightTreadling(4, 8),
-});
+import { twillDraft } from '../fixtures.js';
+
+const DRAFT = twillDraft();
 
 describe('writeWif', () => {
   it('writes a file the reader takes back to the same cloth', () => {

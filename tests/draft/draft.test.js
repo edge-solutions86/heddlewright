@@ -13,14 +13,9 @@ import {
   sameDraft,
 } from '../../src/draft/draft.js';
 
-const TWILL_INPUT = {
-  name: 'four shaft twill',
-  shafts: 4,
-  treadles: 4,
-  threading: straightDraw(4, 8),
-  tieup: twillTieup(4, 2),
-  treadling: straightTreadling(4, 8),
-};
+import { twillRecord } from '../fixtures.js';
+
+const TWILL_INPUT = twillRecord();
 
 describe('createDraft', () => {
   it('fills in the counts a caller does not have to repeat', () => {
