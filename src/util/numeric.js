@@ -81,6 +81,29 @@ export function mean(values) {
   return sum(values) / values.length;
 }
 
+/**
+ * Add a field up over a list of records.
+ *
+ * Twenty seven places in the source had written this reduce out by hand, and
+ * three of them read a field that could be undefined, which quietly gave NaN
+ * instead of naming the record at fault. This names it.
+ */
+export function sumBy(items, read, field = 'items') {
+  array(items, field);
+  let total = 0;
+  for (const [i, item] of items.entries()) {
+    total += number(read(item, i), `${field}[${i}]`);
+  }
+  return total;
+}
+
+/** The mean of a field over a list of records. An empty list averages zero. */
+export function meanBy(items, read, field = 'items') {
+  array(items, field);
+  if (items.length === 0) return 0;
+  return sumBy(items, read, field) / items.length;
+}
+
 /** Population standard deviation, which is what a striking or pick spacing report wants. */
 export function stdev(values) {
   array(values, 'values', { min: 1 });

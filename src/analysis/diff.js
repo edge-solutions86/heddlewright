@@ -1,7 +1,7 @@
 import { InvalidArgument } from '../util/errors.js';
 import { number } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
-import { assertMatrix, dimensions, createMatrix } from '../util/matrix.js';
+import { roundTo, sum } from '../util/numeric.js';
+import { assertMatrix, dimensions, createMatrix, countOnes } from '../util/matrix.js';
 
 /**
  * Comparing two cloths.
@@ -38,7 +38,7 @@ export function differenceMask(left, right) {
 export function differenceCount(left, right) {
   const { rows, cols } = assertSameShape(left, right);
   const mask = differenceMask(left, right);
-  const cells = mask.reduce((total, row) => total + row.reduce((sum, cell) => sum + cell, 0), 0);
+  const cells = countOnes(mask);
   return { cells, total: rows * cols, share: roundTo(cells / (rows * cols), 4) };
 }
 
@@ -61,7 +61,7 @@ export function picksChanged(left, right) {
   return differenceMask(left, right)
     .map((row, index) => ({
       pick: index + 1,
-      cells: row.reduce((total, cell) => total + cell, 0),
+      cells: sum(row),
     }))
     .filter((entry) => entry.cells > 0);
 }

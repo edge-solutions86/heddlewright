@@ -1,6 +1,6 @@
 import { InvalidArgument } from '../util/errors.js';
 import { array, nonEmptyString, number, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 
 /**
  * Fibre blends.
@@ -26,7 +26,7 @@ export function normaliseBlend(parts) {
     }
     named.add(part.fibre);
   }
-  const total = normalised.reduce((sum, part) => sum + part.share, 0);
+  const total = sumBy(normalised, (part) => part.share, 'parts');
   return normalised.map((part) => ({ ...part, share: part.share / total }));
 }
 
@@ -34,7 +34,7 @@ export function normaliseBlend(parts) {
 export function addsToWhole(parts, { tolerance = 0.001 } = {}) {
   array(parts, 'parts', { min: 1 });
   number(tolerance, 'tolerance', { min: 0 });
-  const total = parts.reduce((sum, part) => sum + part.share, 0);
+  const total = sumBy(parts, (part) => part.share, 'parts');
   return Math.abs(total - 100) <= tolerance;
 }
 
@@ -49,7 +49,7 @@ export function labelShares(parts) {
     .map((part) => ({ fibre: part.fibre, exact: part.share * 100 }))
     .sort((a, b) => b.exact - a.exact)
     .map((part) => ({ ...part, percent: Math.round(part.exact) }));
-  const total = rounded.reduce((sum, part) => sum + part.percent, 0);
+  const total = sumBy(rounded, (part) => part.percent, 'parts');
   if (total !== 100 && rounded.length > 0) rounded[0].percent += 100 - total;
   return rounded.map((part) => ({ fibre: part.fibre, percent: part.percent }));
 }

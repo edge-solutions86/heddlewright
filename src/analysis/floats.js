@@ -1,6 +1,7 @@
 import { integer, positiveInteger } from '../util/check.js';
 import { assertMatrix, columns } from '../util/matrix.js';
 import { cyclicRuns, longestRun } from '../util/runs.js';
+import { meanBy } from '../util/numeric.js';
 
 /**
  * Float measurement.
@@ -86,8 +87,7 @@ export function floatHistogram(drawdown) {
 export function meanFloatLength(drawdown) {
   const warp = warpFloats(drawdown);
   const weft = weftFloats(drawdown);
-  const average = (list) =>
-    list.length === 0 ? 0 : list.reduce((total, f) => total + f.length, 0) / list.length;
+  const average = (list) => meanBy(list, (float) => float.length, 'floats');
   return { warp: average(warp), weft: average(weft) };
 }
 

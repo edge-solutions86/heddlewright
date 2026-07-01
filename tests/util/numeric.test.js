@@ -9,7 +9,9 @@ import {
   clamp,
   roundTo,
   sum,
+  sumBy,
   mean,
+  meanBy,
   stdev,
   percentile,
 } from '../../src/util/numeric.js';
@@ -140,5 +142,52 @@ describe('summary statistics', () => {
 
   it('rejects a percentile outside 0 to 100', () => {
     expect(() => percentile([1, 2], 101)).toThrow(InvalidArgument);
+  });
+});
+
+describe('sumBy', () => {
+  const pieces = [{ yards: 40 }, { yards: 55.5 }, { yards: 4.5 }];
+
+  it('adds a field up over records', () => {
+    expect(sumBy(pieces, (piece) => piece.yards)).toBe(100);
+  });
+
+  it('is zero over nothing', () => {
+    expect(sumBy([], (piece) => piece.yards)).toBe(0);
+  });
+
+  it('hands the index to the reader', () => {
+    expect(sumBy(pieces, (piece, index) => index)).toBe(3);
+  });
+
+  it('names the record whose field is missing rather than giving back NaN', () => {
+    const withHole = [{ yards: 1 }, {}, { yards: 3 }];
+    expect(() => sumBy(withHole, (piece) => piece.yards)).toThrow(InvalidArgument);
+    expect(() => sumBy(withHole, (piece) => piece.yards)).toThrow(/items\[1\]/);
+  });
+
+  it('takes the field name the caller uses for its own records', () => {
+    expect(() => sumBy([{}], (piece) => piece.yards, 'pieces')).toThrow(/pieces\[0\]/);
+  });
+
+  it('refuses something that is not a list', () => {
+    expect(() => sumBy(null, (piece) => piece)).toThrow(InvalidArgument);
+  });
+});
+
+describe('meanBy', () => {
+  it('averages a field over records', () => {
+    expect(meanBy([{ n: 2 }, { n: 4 }, { n: 9 }], (entry) => entry.n)).toBe(5);
+  });
+
+  it('reads an empty list as zero rather than throwing, unlike mean', () => {
+    // A run with no readings has no average, and every caller here wants a
+    // number back to put in a report rather than an error to handle.
+    expect(meanBy([], (entry) => entry.n)).toBe(0);
+    expect(() => mean([])).toThrow(InvalidArgument);
+  });
+
+  it('names the record at fault the same way', () => {
+    expect(() => meanBy([{ n: 1 }, {}], (entry) => entry.n, 'readings')).toThrow(/readings\[1\]/);
   });
 });

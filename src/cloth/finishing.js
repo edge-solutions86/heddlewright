@@ -1,6 +1,6 @@
 import { InvalidArgument, NotFound } from '../util/errors.js';
 import { array, nonEmptyString, number, plainObject, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 
 /**
  * Finishing.
@@ -128,11 +128,11 @@ export function naiveRouteShrink(route) {
   assertRouteKnown(route);
   return {
     lengthShrinkPercent: roundTo(
-      route.reduce((total, name) => total + processByName(name).lengthShrink, 0),
+      sumBy(route, (name) => processByName(name).lengthShrink, 'route'),
       3,
     ),
     widthShrinkPercent: roundTo(
-      route.reduce((total, name) => total + processByName(name).widthShrink, 0),
+      sumBy(route, (name) => processByName(name).widthShrink, 'route'),
       3,
     ),
   };

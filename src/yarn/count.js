@@ -1,6 +1,6 @@
 import { InvalidArgument } from '../util/errors.js';
 import { array, nonEmptyString, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sum, sumBy } from '../util/numeric.js';
 
 /**
  * Yarn count systems.
@@ -80,12 +80,9 @@ export function foldedCount(counts, system) {
   const spec = countSystem(system);
   for (const [i, count] of counts.entries()) positiveNumber(count, `counts[${i}]`);
   if (spec.kind === 'direct') {
-    return roundTo(
-      counts.reduce((total, count) => total + count, 0),
-      4,
-    );
+    return roundTo(sum(counts), 4);
   }
-  const reciprocal = counts.reduce((total, count) => total + 1 / count, 0);
+  const reciprocal = sumBy(counts, (count) => 1 / count, 'counts');
   return roundTo(1 / reciprocal, 4);
 }
 

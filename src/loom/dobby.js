@@ -4,6 +4,7 @@ import { assertMatrix, createMatrix, formatMatrix } from '../util/matrix.js';
 import { setPositions, duplicateGroups } from '../util/indexing.js';
 import { period, canonicalRotation } from '../util/cycle.js';
 import { assertFits } from '../util/limits.js';
+import { sum, sumBy } from '../util/numeric.js';
 
 /**
  * The dobby chain.
@@ -70,7 +71,7 @@ export function liftplanFromChain(chain, { action = 'positive' } = {}) {
 /** How many pegs the chain needs, which is what the peg box has to hold. */
 export function pegCount(chain) {
   assertMatrix(chain, 'chain');
-  return chain.reduce((total, lag) => total + lag.reduce((sum, peg) => sum + peg, 0), 0);
+  return sumBy(chain, (lag) => sum(lag), 'chain');
 }
 
 /** How many lags the chain runs to. */
@@ -117,7 +118,7 @@ export function shedlessLags(chain, { action = 'positive' } = {}) {
   const plan = liftplanFromChain(chain, { action });
   const out = [];
   for (const [p, lift] of plan.entries()) {
-    const raised = lift.reduce((total, cell) => total + cell, 0);
+    const raised = sum(lift);
     if (raised === 0) out.push({ lag: p + 1, reason: 'nothing lifted' });
     else if (raised === lift.length) out.push({ lag: p + 1, reason: 'everything lifted' });
   }

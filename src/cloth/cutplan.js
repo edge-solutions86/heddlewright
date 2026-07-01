@@ -1,5 +1,5 @@
 import { array, number, positiveNumber } from '../util/check.js';
-import { roundTo, sum } from '../util/numeric.js';
+import { roundTo, sum, sumBy } from '../util/numeric.js';
 
 /**
  * Cutting a roll around its faults.
@@ -98,7 +98,7 @@ export function bestSingleLength(runs) {
 /** How many lengths of one size the roll gives. */
 export function lengthsAvailable(runs, length) {
   positiveNumber(length, 'length');
-  return runs.reduce((total, run) => total + Math.floor(run.yards / length), 0);
+  return sumBy(runs, (run) => Math.floor(run.yards / length), 'runs');
 }
 
 /**

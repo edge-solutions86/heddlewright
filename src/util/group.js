@@ -1,5 +1,5 @@
 import { array, nonEmptyString, plainObject } from './check.js';
-import { roundTo } from './numeric.js';
+import { roundTo, sumBy } from './numeric.js';
 
 /**
  * Grouping and totalling.
@@ -37,10 +37,7 @@ export function tally(items, { key, label = 'key', fields = {}, places = 3, sort
   for (const [value, members] of groups) {
     const row = { [label]: value, count: members.length };
     for (const [name, read] of Object.entries(fields)) {
-      row[name] = roundTo(
-        members.reduce((total, item) => total + read(item), 0),
-        places,
-      );
+      row[name] = roundTo(sumBy(members, read, 'members'), places);
     }
     rows.push(row);
   }

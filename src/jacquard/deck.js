@@ -1,6 +1,6 @@
 import { DraftError } from '../util/errors.js';
 import { array, positiveInteger, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 import { contentId } from '../util/ids.js';
 import { assertMatrix } from '../util/matrix.js';
 import { period, rotate, canonicalRotation } from '../util/cycle.js';
@@ -121,7 +121,7 @@ export function deckBulk(deck, { cardThicknessMm = 0.6, cardGrams = 18 } = {}) {
 /** The total holes cut across the whole deck, which sizes the punching job. */
 export function totalHoles(deck) {
   array(deck, 'deck', { min: 1 });
-  return deck.reduce((total, card) => total + holeCount(card), 0);
+  return sumBy(deck, (card) => holeCount(card), 'deck');
 }
 
 /** Extend a deck by repeating it until it covers the picks wanted. */

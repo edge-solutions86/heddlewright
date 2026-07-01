@@ -1,6 +1,6 @@
 import { ConflictError, InvalidArgument, NotFound } from '../util/errors.js';
 import { array, nonEmptyString, number, plainObject, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 import { contentId } from '../util/ids.js';
 import { tally } from '../util/group.js';
 
@@ -35,7 +35,7 @@ export function createNote({ reference, customer, pieces, sentOn = null, carrier
     })),
   };
   note.yards = roundTo(
-    note.pieces.reduce((total, piece) => total + piece.yards, 0),
+    sumBy(note.pieces, (piece) => piece.yards, 'pieces'),
     3,
   );
   note.id = contentId('note', note);
@@ -129,7 +129,7 @@ export function coversOrder(notes, { order, orderedYards }) {
   number(orderedYards, 'orderedYards', { min: 0 });
   const mine = notes.filter((note) => note.customer === order);
   const sentYards = roundTo(
-    mine.reduce((total, note) => total + note.yards, 0),
+    sumBy(mine, (note) => note.yards, 'notes'),
     3,
   );
   if (sentYards < 0) {

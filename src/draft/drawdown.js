@@ -1,5 +1,5 @@
 import { array, oneOf, positiveInteger } from '../util/check.js';
-import { createMatrix, assertMatrix, dimensions, columns } from '../util/matrix.js';
+import { createMatrix, assertMatrix, dimensions, columns, countOnes } from '../util/matrix.js';
 import { duplicateGroups } from '../util/indexing.js';
 import { assertThreading } from './threading.js';
 import { SHED_TYPES } from './tieup.js';
@@ -68,7 +68,7 @@ export function pickRow(drawdown, pick) {
 export function warpFaceRatio(drawdown) {
   assertMatrix(drawdown, 'drawdown');
   const total = drawdown.length * drawdown[0].length;
-  const raised = drawdown.reduce((sum, row) => sum + row.reduce((s, cell) => s + cell, 0), 0);
+  const raised = countOnes(drawdown);
   return raised / total;
 }
 

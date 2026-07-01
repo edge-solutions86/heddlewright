@@ -1,5 +1,5 @@
 import { positiveNumber } from '../util/check.js';
-import { roundTo, mean } from '../util/numeric.js';
+import { roundTo, mean, sum } from '../util/numeric.js';
 import { assertMatrix, columns, dimensions } from '../util/matrix.js';
 import { countRuns } from '../util/runs.js';
 import { positionsWhere } from '../util/indexing.js';
@@ -31,8 +31,8 @@ export function intersectionsPerPick(drawdown) {
  */
 export function interlacementFactor(drawdown) {
   const { rows, cols } = dimensions(drawdown);
-  const warp = intersectionsPerEnd(drawdown).reduce((total, n) => total + n, 0);
-  const weft = intersectionsPerPick(drawdown).reduce((total, n) => total + n, 0);
+  const warp = sum(intersectionsPerEnd(drawdown));
+  const weft = sum(intersectionsPerPick(drawdown));
   const most = rows * cols * 2;
   return roundTo((warp + weft) / most, 4);
 }

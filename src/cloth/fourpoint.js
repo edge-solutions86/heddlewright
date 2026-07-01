@@ -1,6 +1,6 @@
 import { InvalidArgument } from '../util/errors.js';
 import { array, number, oneOf, plainObject, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 
 /**
  * Four-point cloth grading.
@@ -59,10 +59,10 @@ export function scoreRoll({ defects, widthInches, yards, cap = MAX_POINTS_PER_YA
     points,
     counted: Math.min(points, cap),
   }));
-  const totalPoints = capped.reduce((total, entry) => total + entry.counted, 0);
+  const totalPoints = sumBy(capped, (entry) => entry.counted, 'defects');
   return {
     defects: defects.length,
-    rawPoints: capped.reduce((total, entry) => total + entry.points, 0),
+    rawPoints: sumBy(capped, (entry) => entry.points, 'defects'),
     totalPoints,
     cappedYards: capped.filter((entry) => entry.points > cap).map((entry) => entry.yard),
     pointsPer100SquareYards: roundTo((totalPoints * 3600) / (widthInches * yards), 2),

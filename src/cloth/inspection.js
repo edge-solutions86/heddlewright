@@ -1,6 +1,6 @@
 import { NotFound } from '../util/errors.js';
 import { array, nonEmptyString, number, oneOf, plainObject } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 import { tally } from '../util/group.js';
 import { defectPoints } from './fourpoint.js';
 
@@ -125,7 +125,7 @@ export function inspectionSheet(defects, { widthInches, yards }) {
   });
   return {
     defects: records.length,
-    points: records.reduce((total, defect) => total + defect.points, 0),
+    points: sumBy(records, (defect) => defect.points, 'defects'),
     density: defectDensity(records, { widthInches, yards }),
     byFault: byFault(records),
     byOrigin: byOrigin(records),

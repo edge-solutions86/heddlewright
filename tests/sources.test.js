@@ -182,3 +182,32 @@ describe('imports name a file rather than a directory', () => {
     expect(rule("import { x } from '../scripts/verify.mjs';\n")).toBe(false);
   });
 });
+
+describe('nobody adds a field up by hand', () => {
+  /**
+   * `sum` and `sumBy` live in util/numeric.js and name the record at fault when
+   * a field is missing. A reduce written out longhand gives NaN instead, and
+   * twenty six of them had accumulated across the source before this rule went
+   * in. util/matrix.js is the exemption because countOnes is the primitive the
+   * rest of the sweep rests on.
+   */
+  const rule = (text, name) =>
+    name !== 'src/util/matrix.js' && /\.reduce\(\((?:total|sum|acc)\b/.test(text);
+
+  it('holds across the source', () => {
+    expect(offenders(SOURCE, rule)).toEqual([]);
+  });
+
+  it('would catch one written out longhand', () => {
+    expect(rule('const t = rows.reduce((total, r) => total + r.yards, 0);\n', 'src/x.js')).toBe(
+      true,
+    );
+    expect(rule('const t = sumBy(rows, (r) => r.yards);\n', 'src/x.js')).toBe(false);
+  });
+
+  it('leaves the one file the primitive lives in alone', () => {
+    const text = 'm.reduce((total, r) => total + r, 0);\n';
+    expect(rule(text, 'src/util/matrix.js')).toBe(false);
+    expect(rule(text, 'src/util/numeric.js')).toBe(true);
+  });
+});

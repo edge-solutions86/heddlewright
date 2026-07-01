@@ -1,6 +1,6 @@
 import { ConflictError, InvalidArgument } from '../util/errors.js';
 import { array, nonEmptyString, number, plainObject, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, meanBy } from '../util/numeric.js';
 import { groupBy } from '../util/group.js';
 
 /**
@@ -87,8 +87,7 @@ export function buildLots(readings, { tolerance }) {
 /** The middle of a lot, which is what a shade card records. */
 export function lotCentre(readings) {
   array(readings, 'readings', { min: 1 });
-  const mean = (read) =>
-    readings.reduce((total, entry) => total + read(entry), 0) / readings.length;
+  const mean = (read) => meanBy(readings, read, 'readings');
   return {
     lightness: roundTo(
       mean((entry) => entry.lightness),

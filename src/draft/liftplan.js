@@ -4,6 +4,7 @@ import { createMatrix, assertMatrix, dimensions } from '../util/matrix.js';
 import { setPositions, labelDistinct } from '../util/indexing.js';
 import { normaliseTieup } from './tieup.js';
 import { normaliseTreadling } from './treadling.js';
+import { sum } from '../util/numeric.js';
 
 /**
  * A liftplan is one row per pick and one column per shaft, which is what a
@@ -79,7 +80,7 @@ export function shaftListsFromLiftplan(liftplan) {
 /** How many shafts each pick lifts, which sizes the dobby cylinder load. */
 export function liftLoad(liftplan) {
   assertMatrix(liftplan, 'liftplan');
-  return liftplan.map((row) => row.reduce((total, cell) => total + cell, 0));
+  return liftplan.map((row) => sum(row));
 }
 
 /** Picks that lift nothing, or lift every shaft, so no shed opens. */

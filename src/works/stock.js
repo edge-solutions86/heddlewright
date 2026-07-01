@@ -1,6 +1,6 @@
 import { ConflictError, InvalidArgument, NotFound } from '../util/errors.js';
 import { array, nonEmptyString, number, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 import { tally } from '../util/group.js';
 
 /**
@@ -29,7 +29,7 @@ export function createLine({ code, description = '', tex, kilograms }) {
 /** What a line has promised out. */
 export function reserved(line) {
   return roundTo(
-    line.reservations.reduce((total, entry) => total + entry.kilograms, 0),
+    sumBy(line.reservations, (entry) => entry.kilograms, 'reservations'),
     4,
   );
 }

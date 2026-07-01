@@ -1,6 +1,6 @@
 import { CapacityError, InvalidArgument } from '../util/errors.js';
 import { nonEmptyString, number, oneOf, plainObject, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 import { toTex } from './count.js';
 
 /**
@@ -90,15 +90,15 @@ export function deliveryTotals(packages) {
   return {
     packages: packages.length,
     grossKg: roundTo(
-      packages.reduce((total, pack) => total + pack.grossKg, 0),
+      sumBy(packages, (pack) => pack.grossKg, 'packages'),
       4,
     ),
     netKg: roundTo(
-      packages.reduce((total, pack) => total + pack.netKg, 0),
+      sumBy(packages, (pack) => pack.netKg, 'packages'),
       4,
     ),
     metres: roundTo(
-      packages.reduce((total, pack) => total + pack.metres, 0),
+      sumBy(packages, (pack) => pack.metres, 'packages'),
       1,
     ),
   };

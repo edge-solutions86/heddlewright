@@ -1,6 +1,6 @@
 import { ConflictError, InvalidArgument } from '../util/errors.js';
 import { nonEmptyString, oneOf, plainObject, positiveNumber } from '../util/check.js';
-import { roundTo } from '../util/numeric.js';
+import { roundTo, sumBy } from '../util/numeric.js';
 import { tallyOver } from '../util/group.js';
 import { contentId } from '../util/ids.js';
 
@@ -109,7 +109,7 @@ export function orderBook(orders) {
   return {
     orders: orders.length,
     openMetres: roundTo(
-      orders.filter((order) => isOpen(order)).reduce((total, order) => total + order.metres, 0),
+      sumBy(orders.filter(isOpen), (order) => order.metres, 'orders'),
       3,
     ),
     byState: totals.map(({ state, count, metres, value }) => ({
