@@ -162,3 +162,48 @@ describe('outturn', () => {
     expect(outturnBook(repository)).toEqual([]);
   });
 });
+
+describe('POST /looms/:reference/boxes', () => {
+  it('gaits a weft order up on the loom that is registered', async () => {
+    const response = await handle(router, {
+      method: 'POST',
+      path: '/looms/N1/boxes',
+      body: { pattern: ['ground', 'ground', 'blue', 'blue'] },
+    });
+    expect(response.status).toBe(200);
+    expect(response.body.chain).toEqual([1, 1, 2, 2]);
+    expect(response.body.changes).toBe(2);
+  });
+
+  it('works the loom speed down by what the changing costs', async () => {
+    const response = await handle(router, {
+      method: 'POST',
+      path: '/looms/N1/boxes',
+      body: { pattern: ['ground', 'ground', 'blue', 'blue'] },
+    });
+    expect(response.body.picksMinute).toBeLessThan(NARROW.picksMinute);
+  });
+
+  it('refuses a pattern the loom is not boxed to pick', async () => {
+    const response = await handle(router, {
+      method: 'POST',
+      path: '/looms/N1/boxes',
+      body: { pattern: ['ground', 'blue', 'blue'] },
+    });
+    expect(response.status).toBe(409);
+    expect(response.body.code).toBe('capacity_error');
+  });
+
+  it('refuses a loom that is not on the floor', async () => {
+    const response = await handle(router, {
+      method: 'POST',
+      path: '/looms/N9/boxes',
+      body: { pattern: ['a', 'a'] },
+    });
+    expect(response.status).toBe(404);
+  });
+
+  it('keeps the boxes path off the reference route', async () => {
+    expect((await handle(router, { path: '/looms/N1' })).status).toBe(200);
+  });
+});

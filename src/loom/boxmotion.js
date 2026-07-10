@@ -1,5 +1,5 @@
 import { CapacityError, InvalidArgument } from '../util/errors.js';
-import { array, integer, positiveInteger, oneOf } from '../util/check.js';
+import { array, integer, positiveInteger, positiveNumber, oneOf } from '../util/check.js';
 import { roundTo, sumBy } from '../util/numeric.js';
 import { runs } from '../util/runs.js';
 import { tally } from '../util/group.js';
@@ -173,7 +173,9 @@ export function picksLostToChanging(chain, { picksPerChange = 0.1 } = {}) {
 
 /** The running speed a chain leaves, given the loom's quoted speed. */
 export function speedWithChanging(chain, { picksMinute, picksPerChange = 0.1 } = {}) {
-  positiveInteger(picksMinute, 'picksMinute');
+  // A register holds a quoted speed that need not be whole: a loom geared at
+  // 217.5 picks a minute is a real entry and not a typing mistake.
+  positiveNumber(picksMinute, 'picksMinute');
   const lost = picksLostToChanging(chain, { picksPerChange });
   const perRepeat = chain.length;
   return roundTo((picksMinute * perRepeat) / (perRepeat + lost), 1);

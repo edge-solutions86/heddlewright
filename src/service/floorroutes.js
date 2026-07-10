@@ -1,7 +1,14 @@
 import { plainObject } from '../util/check.js';
 import { route } from './router.js';
 import { get, insert, list, put } from '../store/repository.js';
-import { createLoom, styleRequirements, loomsFor, byShedding } from '../loom/registry.js';
+import {
+  createLoom,
+  styleRequirements,
+  loomsFor,
+  byShedding,
+  loomByReference,
+} from '../loom/registry.js';
+import { boxMotionPlan } from '../loom/boxmotion.js';
 import { createRun, schedule, loomLoad, lateOrders } from '../works/schedule.js';
 import { createOrder, advanceOrder, orderBook, openOrders } from '../works/orders.js';
 import { recordBook, againstPlan, loomRates } from '../works/production.js';
@@ -40,6 +47,17 @@ export function mountFloorRoutes(router, repository) {
     plainObject(body, 'body');
     const wanted = styleRequirements(body);
     return loomsFor(loomRecords(repository), wanted).map((loom) => loom.reference);
+  });
+
+  route(router, 'POST', '/looms/:reference/boxes', ({ params, body }) => {
+    plainObject(body, 'body');
+    const loom = loomByReference(loomRecords(repository), params.reference);
+    return boxMotionPlan({
+      pattern: body.pattern,
+      boxes: loom.shuttleBoxes,
+      boxedAt: loom.boxedAt,
+      picksMinute: loom.picksMinute,
+    });
   });
 
   route(router, 'GET', '/orders', ({ query }) => {

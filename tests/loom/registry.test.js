@@ -174,3 +174,70 @@ describe('byShedding', () => {
     ]);
   });
 });
+
+describe('how a loom is boxed', () => {
+  it('reads as boxed at one end unless the register says otherwise', () => {
+    expect(DOBBY.boxedAt).toBe('one');
+    expect(createLoom({ ...DOBBY, boxedAt: 'both' }).boxedAt).toBe('both');
+  });
+
+  it('refuses a boxing nobody builds', () => {
+    expect(() => createLoom({ ...DOBBY, boxedAt: 'left' })).toThrow(InvalidArgument);
+  });
+});
+
+describe('a style quoted as a weft pattern', () => {
+  const CHECK = ['red', 'red', 'blue', 'blue'];
+  const SINGLE = ['red', 'blue', 'blue', 'blue'];
+
+  it('counts its own colours', () => {
+    const wanted = styleRequirements({ widthCm: 100, weftPattern: CHECK });
+    expect(wanted.weftColours).toBe(2);
+    expect(wanted.weftPattern).toEqual(CHECK);
+  });
+
+  it('keeps a copy, so amending the list it was given changes nothing', () => {
+    const pattern = [...CHECK];
+    const wanted = styleRequirements({ widthCm: 100, weftPattern: pattern });
+    pattern[0] = 'green';
+    expect(wanted.weftPattern[0]).toBe('red');
+  });
+
+  it('refuses a colour count that disagrees with the pattern', () => {
+    expect(() => styleRequirements({ widthCm: 100, weftPattern: CHECK, weftColours: 3 })).toThrow(
+      InvalidArgument,
+    );
+    expect(() =>
+      styleRequirements({ widthCm: 100, weftPattern: CHECK, weftColours: 2 }),
+    ).not.toThrow();
+  });
+
+  it('carries no pattern when it was quoted as a count', () => {
+    expect(styleRequirements({ widthCm: 100, weftColours: 2 }).weftPattern).toBeUndefined();
+  });
+
+  it('cannot go on a loom boxed at one end when the picks do not pair', () => {
+    const wanted = styleRequirements({ widthCm: 100, weftPattern: SINGLE });
+    const problems = shortfalls(DOBBY, wanted);
+    expect(problems.map((problem) => problem.code)).toEqual(['shuttle_strands']);
+    expect(problems[0].detail.runs[0]).toMatchObject({ colour: 'red', picks: 1 });
+  });
+
+  it('goes on the same loom boxed at both ends', () => {
+    const wanted = styleRequirements({ widthCm: 100, weftPattern: SINGLE });
+    expect(canWeave(createLoom({ ...DOBBY, boxedAt: 'both' }), wanted)).toBe(true);
+  });
+
+  it('says nothing about pairing when the style was quoted as a count', () => {
+    // A bare count carries no order, so there is nothing here to fail on.
+    expect(canWeave(DOBBY, styleRequirements({ widthCm: 100, weftColours: 2 }))).toBe(true);
+  });
+
+  it('still wants a box for every colour', () => {
+    const wanted = styleRequirements({
+      widthCm: 100,
+      weftPattern: ['a', 'a', 'b', 'b', 'c', 'c', 'd', 'd', 'e', 'e'],
+    });
+    expect(shortfalls(DOBBY, wanted).map((problem) => problem.code)).toEqual(['too_few_boxes']);
+  });
+});

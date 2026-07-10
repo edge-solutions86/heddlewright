@@ -8,6 +8,7 @@ import { measureAll, weaveByName, families } from '../weave/catalogue.js';
 import { smallestMachineFor } from '../jacquard/machine.js';
 import { deckFromLiftplan, deckLength, deckRepeat, totalHoles } from '../jacquard/deck.js';
 import { quoteDeck } from '../jacquard/estimate.js';
+import { boxMotionPlan } from '../loom/boxmotion.js';
 import { checkOptions } from './parse.js';
 import { define, specOf } from './registry.js';
 
@@ -21,7 +22,7 @@ import { define, specOf } from './registry.js';
  * what a file contributes without running it, and so that nothing here is a
  * pure side effect on import with no trace of itself.
  */
-export const SHOP_COMMANDS = ['weave', 'sett', 'count', 'systems', 'catalogue', 'deck'];
+export const SHOP_COMMANDS = ['weave', 'sett', 'count', 'systems', 'catalogue', 'deck', 'boxes'];
 
 define(
   'weave',
@@ -135,6 +136,40 @@ define(
       repeat: deckRepeat(deck),
       holes: totalHoles(deck),
       poundsAndPence: (quote.totalPence / 100).toFixed(2),
+    });
+  },
+);
+
+define(
+  'boxes',
+  'gait a weft order up on a drop box loom',
+  {
+    pattern: { type: 'string', required: true },
+    boxes: { type: 'integer', default: 4 },
+    boxedAt: { type: 'string', default: 'both' },
+    picksMinute: { type: 'number', default: 180 },
+  },
+  (parsed) => {
+    const options = checkOptions(parsed, specOf('boxes'));
+    // The pattern comes in as one argument so that a weaver can paste the
+    // order off a pattern card: "ground ground blue blue" and be done.
+    const pattern = options.pattern.split(/[\s,]+/).filter((word) => word.length > 0);
+    const plan = boxMotionPlan({
+      pattern,
+      boxes: options.boxes,
+      boxedAt: options.boxedAt,
+      picksMinute: options.picksMinute,
+    });
+    const allotment = plan.allotment.map((entry) => `${entry.box}:${entry.colour}`).join('  ');
+    return renderPairs({
+      picks: plan.picks,
+      colours: plan.colours,
+      boxes: allotment,
+      chain: plan.chain.join(' '),
+      changes: plan.changes,
+      longestLift: plan.longestLift,
+      picksLost: plan.picksLost,
+      picksMinute: plan.picksMinute,
     });
   },
 );

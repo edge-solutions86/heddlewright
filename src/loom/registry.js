@@ -1,4 +1,4 @@
-import { CapacityError, NotFound } from '../util/errors.js';
+import { CapacityError, InvalidArgument, NotFound } from '../util/errors.js';
 import {
   integer,
   nonEmptyString,
@@ -10,14 +10,15 @@ import {
 } from '../util/check.js';
 import { roundTo } from '../util/numeric.js';
 import { groupBy } from '../util/group.js';
+import { BOXING, coloursIn, oddRuns } from './boxmotion.js';
 
 /**
  * The loom register.
  *
  * A shed floor is a list of machines, each with a width, a shedding motion and
  * a speed, and a style can only be put on a loom that can actually hold it.
- * Matching a style to a loom is a capacity question with four parts, and this
- * is where they are all asked at once.
+ * Matching a style to a loom is a capacity question with several parts, and
+ * this is where they are all asked at once.
  */
 
 export const SHEDDING = ['tappet', 'dobby', 'jacquard'];
@@ -39,6 +40,9 @@ export function createLoom(input) {
     picksMinute: positiveNumber(input.picksMinute, 'picksMinute'),
     shuttleBoxes:
       input.shuttleBoxes === undefined ? 1 : positiveInteger(input.shuttleBoxes, 'shuttleBoxes'),
+    // Which ends of the sley are boxed. A loom with one box has nothing to be
+    // boxed at, so it reads as boxed at one end and the weft rule never bites.
+    boxedAt: oneOf(input.boxedAt ?? 'one', 'boxedAt', BOXING),
     installed: input.installed ?? null,
   });
 }
@@ -53,15 +57,39 @@ export function loomByReference(looms, reference) {
 }
 
 /**
- * What a style asks of a loom: a width, a shedding capacity, and as many
- * shuttle boxes as it has weft colours.
+ * What a style asks of a loom: a width, a shedding capacity, and a box for
+ * every weft colour.
+ *
+ * A weft pattern may be given instead of a colour count. It carries more than
+ * the count does, because the order the colours are picked in decides whether a
+ * loom boxed at one end can pick them at all, and a bare count cannot say.
  */
-export function styleRequirements({ widthCm, shafts = 0, hooks = 0, weftColours = 1 }) {
+export function styleRequirements({ widthCm, shafts = 0, hooks = 0, weftColours, weftPattern }) {
   positiveNumber(widthCm, 'widthCm');
   number(shafts, 'shafts', { min: 0 });
   number(hooks, 'hooks', { min: 0 });
-  positiveInteger(weftColours, 'weftColours');
-  return { widthCm, shafts, hooks, weftColours };
+  if (weftPattern === undefined) {
+    return {
+      widthCm,
+      shafts,
+      hooks,
+      weftColours: positiveInteger(weftColours ?? 1, 'weftColours'),
+    };
+  }
+  const colours = coloursIn(weftPattern);
+  if (weftColours !== undefined && weftColours !== colours.length) {
+    throw new InvalidArgument('weftColours does not match the pattern given', {
+      weftColours,
+      counted: colours.length,
+    });
+  }
+  return {
+    widthCm,
+    shafts,
+    hooks,
+    weftColours: colours.length,
+    weftPattern: [...weftPattern],
+  };
 }
 
 /** Every reason a loom cannot take a style, or an empty list when it can. */
@@ -101,6 +129,18 @@ export function shortfalls(loom, requirements) {
       message: `${loom.reference} has ${loom.shuttleBoxes} shuttle boxes`,
       detail: { needed: requirements.weftColours, available: loom.shuttleBoxes },
     });
+  }
+  // Only a pattern can fail this one. A style quoted as a colour count says
+  // nothing about the order, so there is nothing here to fail on.
+  if (requirements.weftPattern !== undefined && loom.boxedAt === 'one') {
+    const odd = oddRuns(requirements.weftPattern);
+    if (odd.length > 0) {
+      problems.push({
+        code: 'shuttle_strands',
+        message: `${loom.reference} is boxed at one end and the weft is not picked in pairs`,
+        detail: { runs: odd },
+      });
+    }
   }
   return problems;
 }

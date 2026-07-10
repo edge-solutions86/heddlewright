@@ -34,14 +34,20 @@ export function twillDraft(options) {
   return createDraft(twillRecord(options));
 }
 
-/** A narrow eight shaft dobby, the loom most of the shop floor tests load. */
-export function narrowLoom({ picksMinute = 200 } = {}) {
+/**
+ * A narrow eight shaft dobby, the loom most of the shop floor tests load. It is
+ * a four box loom because the shop floor tests need somewhere to put a second
+ * weft, and a plain one box loom is the odd case rather than the usual one.
+ */
+export function narrowLoom({ picksMinute = 200, shuttleBoxes = 4, boxedAt = 'one' } = {}) {
   return {
     reference: 'N1',
     shedding: 'dobby',
     reedWidthCm: 120,
     shafts: 8,
     picksMinute,
+    shuttleBoxes,
+    boxedAt,
   };
 }
 

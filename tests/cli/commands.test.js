@@ -259,3 +259,26 @@ describe('buildDraft', () => {
     expect(draft.tieup[0].length).toBe(3);
   });
 });
+
+describe('the boxes command', () => {
+  it('gaits a weft order up and prints the chain to lace', () => {
+    const text = run(['boxes', '--pattern', 'ground ground blue blue', '--boxes', '2']);
+    expect(text).toMatch(/picks\s*:\s*4/);
+    expect(text).toMatch(/chain\s*:\s*1 1 2 2/);
+    expect(text).toContain('1:ground');
+  });
+
+  it('takes the order written with commas, the way a pattern card is', () => {
+    const text = run(['boxes', '--pattern', 'red,red,blue,blue', '--boxes', '2']);
+    expect(text).toMatch(/colours\s*:\s*2/);
+  });
+
+  it('refuses an order that will not pair on a loom boxed at one end', () => {
+    const args = ['boxes', '--pattern', 'red blue blue', '--boxes', '2', '--boxedAt', 'one'];
+    expect(() => run(args)).toThrow(/picked in pairs/);
+  });
+
+  it('refuses more wefts than the loom has boxes', () => {
+    expect(() => run(['boxes', '--pattern', 'a a b b c c', '--boxes', '2'])).toThrow(/will not go/);
+  });
+});
