@@ -25,6 +25,8 @@
     "bench": "node scripts/bench.mjs",
     "surface": "node scripts/surface.mjs",
     "surface:check": "node scripts/surface.mjs --check",
+    "architecture": "node scripts/architecture.mjs",
+    "architecture:check": "node scripts/architecture.mjs --check",
     "coverage:report": "node scripts/coverage.mjs"
   },
   "devDependencies": {

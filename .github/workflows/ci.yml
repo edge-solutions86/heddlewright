@@ -39,6 +39,7 @@ jobs:
       - run: npm ci
       - run: npm run verify
       - run: npm run surface:check
+      - run: npm run architecture:check
 
   test:
     name: test on node ${{ matrix.node }} (${{ matrix.os }})

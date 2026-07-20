@@ -69,6 +69,14 @@ objects, so it can be driven without a socket. `createServer()` puts node's
 http server round it. `docs/surface.md` lists every route and is generated from
 the code rather than written by hand.
 
+## How it is put together
+
+`src` is six layers deep and a file may only import downwards or sideways:
+`util` at the floor, then the drafting and cloth arithmetic, then the machines,
+then the works, the store, and the service and command line at the edge.
+`docs/architecture.md` is generated from the imports themselves, and the check
+fails the build if anything imports upwards.
+
 ## Running the checks
 
 ```
@@ -77,6 +85,7 @@ npm run lint        # eslint
 npm run format:check
 npm run verify      # bytes, imports, dependencies, pairing, script guards
 npm run surface:check
+npm run architecture:check
 npm run smoke       # the service over a real socket
 npm run bench       # timings, which never fail
 npm run coverage
