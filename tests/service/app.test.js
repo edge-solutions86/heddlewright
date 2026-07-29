@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { createJournal, toJson, fromJson } from '../../src/store/journal.js';
 import { createApp, routeTable, duplicateRoutes, VERSION } from '../../src/service/app.js';
 
@@ -127,5 +128,18 @@ describe('reopening from a journal', () => {
   it('starts empty on a fresh journal', async () => {
     const fresh = createApp({ journal: createJournal() });
     expect((await fresh.request({ path: '/drafts' })).body).toEqual([]);
+  });
+});
+
+describe('the version the service reports', () => {
+  it('is the version the package declares', () => {
+    // Two places name the version and neither can read the other at runtime, so
+    // this is the thing that keeps them from drifting apart.
+    const text = readFileSync(new URL('../../package.json', import.meta.url), 'utf8');
+    expect(VERSION).toBe(JSON.parse(text).version);
+  });
+
+  it('reads like a version rather than a word', () => {
+    expect(VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
 });

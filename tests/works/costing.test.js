@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { InvalidArgument } from '../../src/util/errors.js';
+import { CapacityError, InvalidArgument } from '../../src/util/errors.js';
 import {
   yarnCostPerMetre,
   loomCostPerMetre,
+  runningSpeed,
   withWaste,
   costPerMetre,
   priceForMargin,
@@ -142,3 +143,65 @@ describe('compare', () => {
 function roundFour(value) {
   return Math.round(value * 10000) / 10000;
 }
+
+describe('runningSpeed', () => {
+  it('is the quoted speed when there is only one weft', () => {
+    expect(runningSpeed({ picksMinute: 200 })).toBe(200);
+  });
+
+  it('comes down for a cloth that changes box on every pick', () => {
+    // Pick and pick changes twice over a two pick repeat, so the box is lifting
+    // as often as the loom is picking.
+    expect(runningSpeed({ picksMinute: 200, weftPattern: ['a', 'b'] })).toBe(181.8);
+  });
+
+  it('comes down less for a cloth that changes every other pick', () => {
+    const twoAndTwo = runningSpeed({ picksMinute: 200, weftPattern: ['a', 'a', 'b', 'b'] });
+    expect(twoAndTwo).toBeGreaterThan(runningSpeed({ picksMinute: 200, weftPattern: ['a', 'b'] }));
+    expect(twoAndTwo).toBeLessThan(200);
+  });
+
+  it('refuses a pattern with more colours than the boxes given', () => {
+    expect(() =>
+      runningSpeed({ picksMinute: 200, weftPattern: ['a', 'b', 'c'], boxes: 2 }),
+    ).toThrow(CapacityError);
+  });
+
+  it('counts the boxes off the pattern when it is not told', () => {
+    expect(runningSpeed({ picksMinute: 200, weftPattern: ['a', 'b', 'c'] })).toBeLessThan(200);
+  });
+});
+
+describe('a colour woven cloth on the loom', () => {
+  const loom = { picksMinute: 200, picksPerCm: 20, ratePerHour: 9 };
+
+  it('costs more loom time than the same sett in one weft', () => {
+    const plain = loomCostPerMetre(loom);
+    const woven = loomCostPerMetre({ ...loom, weftPattern: ['a', 'b'] });
+    expect(woven).toBeGreaterThan(plain);
+    expect(woven / plain).toBeCloseTo(200 / 181.8, 2);
+  });
+
+  it('carries through the whole cost, since the loom passes what it is given', () => {
+    const shared = {
+      construction: CLOTH,
+      prices: PRICES,
+      widthMetres: 1.5,
+    };
+    const plain = costPerMetre({ ...shared, loom });
+    const woven = costPerMetre({ ...shared, loom: { ...loom, weftPattern: ['a', 'b'] } });
+    expect(woven.weaving).toBeGreaterThan(plain.weaving);
+    expect(woven.yarn).toBe(plain.yarn);
+    expect(woven.total).toBeGreaterThan(plain.total);
+  });
+
+  it('reads as a weaving change rather than a yarn one', () => {
+    const shared = { construction: CLOTH, prices: PRICES, widthMetres: 1.5 };
+    const moved = compare(
+      { ...shared, loom },
+      { ...shared, loom: { ...loom, weftPattern: ['a', 'b'] } },
+    );
+    expect(moved.movedBy).toBe('weaving');
+    expect(moved.yarnMoved).toBe(0);
+  });
+});

@@ -2,6 +2,7 @@ import { InvalidArgument } from '../util/errors.js';
 import { number, plainObject, positiveNumber } from '../util/check.js';
 import { roundTo } from '../util/numeric.js';
 import { clothWeightGsm } from '../analysis/weight.js';
+import { allotBoxes, boxChain, speedWithChanging } from '../loom/boxmotion.js';
 
 /**
  * Costing a cloth.
@@ -14,6 +15,10 @@ import { clothWeightGsm } from '../analysis/weight.js';
  *
  * Nothing here decides anything. It lays the two terms out separately so a
  * designer can see which one their change actually moved.
+ *
+ * A colour woven cloth pays a third thing that neither term shows: the loom
+ * stops for its box to lift on every change of weft, so the same sett on the
+ * same loom weaves slower. That is loom time and it is costed as loom time.
  */
 
 /** Yarn cost for a metre of cloth at its full width. */
@@ -33,13 +38,36 @@ export function yarnCostPerMetre(construction, prices, { widthMetres }) {
   };
 }
 
-/** Loom cost for a metre, from the speed, the sett and an hourly rate. */
-export function loomCostPerMetre({ picksMinute, picksPerCm, efficiency = 0.85, ratePerHour }) {
+/**
+ * The speed a weft order leaves, which is the quoted speed less the box
+ * changing. A cloth with one weft never changes and runs at the quoted figure.
+ */
+export function runningSpeed({ picksMinute, weftPattern, boxes }) {
   positiveNumber(picksMinute, 'picksMinute');
+  if (weftPattern === undefined) return picksMinute;
+  const allotment = allotBoxes(weftPattern, { boxes: boxes ?? new Set(weftPattern).size });
+  return speedWithChanging(boxChain(weftPattern, allotment), { picksMinute });
+}
+
+/**
+ * Loom cost for a metre, from the speed, the sett and an hourly rate.
+ *
+ * A weft pattern may be given, in which case the speed used is the one the box
+ * motion actually leaves rather than the one on the loom's plate.
+ */
+export function loomCostPerMetre({
+  picksMinute,
+  picksPerCm,
+  efficiency = 0.85,
+  ratePerHour,
+  weftPattern,
+  boxes,
+}) {
   positiveNumber(picksPerCm, 'picksPerCm');
   positiveNumber(ratePerHour, 'ratePerHour');
   number(efficiency, 'efficiency', { min: 0.01, max: 1 });
-  const metresPerHour = ((picksMinute * 60) / picksPerCm / 100) * efficiency;
+  const running = runningSpeed({ picksMinute, weftPattern, boxes });
+  const metresPerHour = ((running * 60) / picksPerCm / 100) * efficiency;
   return roundTo(ratePerHour / metresPerHour, 4);
 }
 

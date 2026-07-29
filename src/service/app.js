@@ -15,7 +15,12 @@ import { mountWeaveRoutes } from './weaveroutes.js';
  * write the service has taken.
  */
 
-export const VERSION = '0.1.0';
+/**
+ * The version the service reports. It is written here rather than read out of
+ * package.json, which is not part of what ships when the package is consumed as
+ * source, and the tests hold the two together.
+ */
+export const VERSION = '0.2.0';
 
 /** Build the service over a journal, with every route mounted. */
 export function createApp({ journal = createJournal() } = {}) {

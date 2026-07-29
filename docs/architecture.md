@@ -25,7 +25,7 @@ it, and never from one above.
 - `edge -> plant` 10 imports
 - `edge -> store` 5 imports
 - `edge -> works` 3 imports
-- `works -> plant` 2 imports
+- `works -> plant` 3 imports
 - `works -> craft` 1 imports
 
 ## Nothing in src imports these
