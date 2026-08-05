@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { run, EXIT_OK, EXIT_USAGE, EXIT_ERROR } from '../../src/cli/run.js';
 
 describe('run', () => {
@@ -68,27 +69,53 @@ describe('run', () => {
 });
 
 describe('the binary', () => {
-  const bin = new URL('../../bin/heddle.js', import.meta.url);
+  /**
+   * `fileURLToPath`, not the path property of the URL. On Windows that reads
+   * `/C:/somewhere` and the leading slash has to come off; on Linux taking it
+   * off turns an absolute path into a relative one, which is what it did here
+   * until a Linux runner said so. This function knows the difference and the
+   * tests do not have to.
+   */
+  const bin = fileURLToPath(new URL('../../bin/heddle.js', import.meta.url));
 
   it('has no shebang, which a checkout with converted line endings would break', () => {
     const source = readFileSync(bin, 'utf8');
     expect(source.startsWith('#!')).toBe(false);
   });
 
+  it('is a real file at the path the tests build', () => {
+    // The positive control for the two below. A path that resolves to nothing
+    // makes node exit non-zero for the wrong reason, and the exit code test
+    // cannot tell that apart from the failure it means to check.
+    expect(existsSync(bin)).toBe(true);
+  });
+
   it('prints what run gives it', () => {
-    const out = execFileSync(process.execPath, [bin.pathname.replace(/^\//, ''), 'weave']);
+    const out = execFileSync(process.execPath, [bin, 'weave']);
     expect(out.toString().trim()).toBe('XX..\n.XX.\n..XX\nX..X');
   });
 
-  it('sets a non-zero exit code when the command fails', () => {
+  it('sets the usage exit code when the command is not one', () => {
+    let code = 0;
+    let stderr = '';
+    try {
+      execFileSync(process.execPath, [bin, 'nothing'], { stdio: 'pipe' });
+    } catch (err) {
+      code = err.status;
+      stderr = err.stderr.toString();
+    }
+    expect(code).toBe(EXIT_USAGE);
+    // Without this the test passes on a binary node could not even load.
+    expect(stderr).toContain('nothing');
+  });
+
+  it('sets the error exit code when the command is one but the options are wrong', () => {
     let code = 0;
     try {
-      execFileSync(process.execPath, [bin.pathname.replace(/^\//, ''), 'nothing'], {
-        stdio: 'pipe',
-      });
+      execFileSync(process.execPath, [bin, 'sett'], { stdio: 'pipe' });
     } catch (err) {
       code = err.status;
     }
-    expect(code).toBe(EXIT_USAGE);
+    expect(code).toBe(EXIT_ERROR);
   });
 });

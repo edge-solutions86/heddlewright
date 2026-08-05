@@ -211,3 +211,47 @@ describe('nobody adds a field up by hand', () => {
     expect(rule(text, 'src/util/numeric.js')).toBe(true);
   });
 });
+
+describe('nobody turns a file URL into a path by hand', () => {
+  /**
+   * `new URL(...).pathname` reads `/C:/somewhere` on Windows and
+   * `/somewhere` on Linux, so the leading slash has to come off on one and
+   * must stay on the other. Every attempt to do that inline gets one of the
+   * two platforms wrong, and this repository got Linux wrong for eight
+   * commits without a local run ever saying so. `fileURLToPath` knows.
+   */
+  const rule = (text) => /\.pathname/.test(text);
+
+  it('holds across the repository', () => {
+    expect(offenders(FILES, rule)).toEqual([]);
+  });
+
+  it('would catch the way it was written before', () => {
+    expect(rule("execFileSync(node, [bin.pathname.replace(/^./, ''), 'weave']);\n")).toBe(true);
+    expect(rule('execFileSync(node, [fileURLToPath(bin), "weave"]);\n')).toBe(false);
+  });
+});
+
+describe('a path is built rather than pasted together', () => {
+  /**
+   * A drive letter in a string literal is a Windows path that will not resolve
+   * on a Linux runner. Only the drive letter is looked for: a backslash on its
+   * own is no evidence at all here, because a drawdown is a string of dots and
+   * newline escapes and half the weave tests carry one.
+   */
+  const rule = (text) => /['"][A-Za-z]:\\/.test(text);
+
+  it('holds across the repository', () => {
+    expect(offenders(FILES, rule)).toEqual([]);
+  });
+
+  it('would catch a windows path written into the source', () => {
+    expect(rule('const root = "C:\\repo\\src";\n')).toBe(true);
+    expect(rule("const root = join(here, '..', 'src');\n")).toBe(false);
+  });
+
+  it('says nothing about a drawdown, which is dots and newlines', () => {
+    expect(rule("parseMatrix('..\\n..')")).toBe(false);
+    expect(rule("formatMatrix(m).split('\\n')")).toBe(false);
+  });
+});
