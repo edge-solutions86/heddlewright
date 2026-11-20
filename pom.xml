@@ -132,8 +132,9 @@
           <release>${java.version}</release>
           <failOnWarning>true</failOnWarning>
           <compilerArgs>
-            <arg>-Xlint:all,-serial</arg>
-            <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
+            <!-- -serial: the exceptions are never serialised; -processing: picocli-codegen
+                 reports options no processor claims while a source set has no commands. -->
+            <arg>-Xlint:all,-serial,-processing</arg>
           </compilerArgs>
           <annotationProcessorPaths>
             <path>
