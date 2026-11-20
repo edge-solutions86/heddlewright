@@ -1,5 +1,10 @@
 # heddlewright
 
+[![CI](https://github.com/rkaushik-dev/heddlewright/actions/workflows/ci.yml/badge.svg)](https://github.com/rkaushik-dev/heddlewright/actions/workflows/ci.yml)
+![Java 21](https://img.shields.io/badge/Java-21-007396)
+![Maven](https://img.shields.io/badge/build-Maven-C71A36)
+![JUnit 5](https://img.shields.io/badge/tests-JUnit%205-25A162)
+
 Draft, card deck and cloth analysis tooling for a weaving shed that runs both
 dobby and Jacquard looms.
 
