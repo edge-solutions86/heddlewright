@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-/** The JavaScript text semantics the port reproduces, pinned against what node prints. */
+/** The number and text rules every docket, message and JSON body is written by. */
 class TextTest {
 
     @ParameterizedTest
@@ -26,7 +26,7 @@ class TextTest {
         "100, 100",
         "1e20, 100000000000000000000"
     })
-    void writesANumberTheWayStringDoes(double value, String expected) {
+    void writesANumberAsTheShortestDecimalThatReadsBack(double value, String expected) {
         assertThat(Text.number(value)).isEqualTo(expected);
     }
 
@@ -38,7 +38,7 @@ class TextTest {
     }
 
     @Test
-    void roundsToFixedOnTheBinaryValue() {
+    void roundsToAFixedPlaceCountOnTheBinaryValue() {
         assertThat(Text.fixed(1.005, 2)).isEqualTo("1.00");
         assertThat(Text.fixed(2.5, 0)).isEqualTo("3");
         assertThat(Text.fixed(-2.5, 0)).isEqualTo("-3");
@@ -48,7 +48,7 @@ class TextTest {
     }
 
     @Test
-    void stringsAValueTheWayStringDoes() {
+    void writesAnyValueAsText() {
         assertThat(Text.string(Json.arr(1, "a", Json.NULL))).isEqualTo("1,a,");
         assertThat(Text.string(Json.obj())).isEqualTo("[object Object]");
         assertThat(Text.string(Json.MISSING)).isEqualTo("undefined");
@@ -56,7 +56,7 @@ class TextTest {
     }
 
     @Test
-    void readsANumberTheWayNumberDoes() {
+    void readsATextAsANumber() {
         assertThat(Text.toNumber(" 12 ")).isEqualTo(12);
         assertThat(Text.toNumber("")).isEqualTo(0);
         assertThat(Text.toNumber("1e3")).isEqualTo(1000);
@@ -68,7 +68,7 @@ class TextTest {
     }
 
     @Test
-    void splitsTrimsAndPadsTheWayJavaScriptDoes() {
+    void splitsTrimsAndPadsCountingUnicodeSpaces() {
         assertThat(Text.split("a,,b", ",")).isEqualTo(List.of("a", "", "b"));
         assertThat(Text.split("ab", "")).isEqualTo(List.of("a", "b"));
         assertThat(Text.trim((char) 0xa0 + " x " + (char) 0xfeff)).isEqualTo("x");
@@ -80,7 +80,7 @@ class TextTest {
     }
 
     @Test
-    void matchesJavaScriptWhiteSpaceInPatterns() {
+    void matchesUnicodeWhiteSpaceInPatterns() {
         String nbsp = String.valueOf((char) 0xa0);
         assertThat(nbsp.matches(Text.SPACE_CLASS)).isTrue();
         assertThat(nbsp.matches("\\s")).isFalse();
@@ -89,7 +89,7 @@ class TextTest {
     }
 
     @Test
-    void quotesStringsTheWayStringifyDoes() {
+    void quotesStringsAndPutsIndexKeysFirst() {
         assertThat(Json.stringify("a\"b\\\n\u0001")).isEqualTo("\"a\\\"b\\\\\\n\\u0001\"");
         assertThat(Json.stringify(Json.obj("a", 1, "b", Json.arr()), 2)).isEqualTo("{\n  \"a\": 1,\n  \"b\": []\n}");
         assertThat(Json.obj("b", 1, "2", 2, "1", 3).keys()).containsExactly("1", "2", "b");

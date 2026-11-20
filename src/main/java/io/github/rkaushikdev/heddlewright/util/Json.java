@@ -79,7 +79,7 @@ public sealed interface Json permits Json.Null, Json.Bool, Json.Num, Json.Str, J
         return this instanceof Missing;
     }
 
-    /** Whether this is null or absent, the two readings a JavaScript caller would call nullish. */
+    /** Whether this is null or absent, the two readings that leave a field to its default. */
     default boolean isNullish() {
         return this instanceof Missing || this instanceof Null;
     }
@@ -167,12 +167,12 @@ public sealed interface Json permits Json.Null, Json.Bool, Json.Num, Json.Str, J
         return JsonArray.of(items);
     }
 
-    /** {@code JSON.stringify}: compact, keys in the order the object holds them. */
+    /** The value as compact JSON text, keys in the order the object holds them. */
     static String stringify(Object value) {
         return JsonWriter.write(of(value), 0);
     }
 
-    /** {@code JSON.stringify(value, null, indent)}. */
+    /** The value as JSON text indented by that many spaces a level. */
     static String stringify(Object value, int indent) {
         return JsonWriter.write(of(value), indent);
     }

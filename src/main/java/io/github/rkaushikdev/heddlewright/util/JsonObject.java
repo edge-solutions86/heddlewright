@@ -10,9 +10,9 @@ import java.util.Set;
 /**
  * A JSON object: an immutable, ordered map from keys to values.
  *
- * <p>Keys keep the order a JavaScript object gives them, which is the order they were added in,
- * except that keys reading as array indices come first in ascending order. That is the order
- * {@code JSON.stringify} writes, so a record printed here prints the way it always has.
+ * <p>Keys keep the order they were added in, except that keys reading as array indices (0 up to
+ * 2^32 - 2, written without leading zeros) come first in ascending order. That is the order a
+ * record is written out in, so the same record always prints the same text.
  *
  * <p>Equality ignores key order, as a deep comparison of two plain records does.
  */
@@ -27,7 +27,7 @@ public final class JsonObject implements Json, Iterable<Map.Entry<String, Json>>
         this.fields = fields;
     }
 
-    /** An object over a map of already converted values, in the JavaScript key order. */
+    /** An object over a map of already converted values, in the key order described above. */
     static JsonObject wrap(Map<String, Json> source) {
         if (source.isEmpty()) {
             return EMPTY;

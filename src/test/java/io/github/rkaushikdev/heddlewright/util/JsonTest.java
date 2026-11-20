@@ -100,7 +100,7 @@ class JsonTest {
         }
     }
 
-    /** The JavaScript froze plain records in place; a JSON value here is immutable from the start. */
+    /** A JSON value is immutable from the moment it is built, nested objects and arrays included. */
     @Nested
     class DeepFreeze {
 

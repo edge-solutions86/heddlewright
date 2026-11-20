@@ -70,7 +70,7 @@ class RegistryTest {
         void recordsTheMachineAndFreezesIt() {
             assertThat(DOBBY.shafts()).isEqualTo(16);
             assertThat(DOBBY.hooks()).isEqualTo(0);
-            // A record has no setters, which is what freezing gave the JavaScript.
+            // A record has no setters, so nothing can change one after it is built.
             assertThat(Loom.class.isRecord()).isTrue();
         }
 

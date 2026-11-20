@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** The root collation order the JavaScript sorted by, pinned against what node prints. */
+/** The Unicode root collation order, pinned against the CLDR root sort of the same strings. */
 class CollationTest {
 
     private static List<String> sorted(String... values) {
@@ -37,7 +37,7 @@ class CollationTest {
     }
 
     @Test
-    void ordersTheWeaveCatalogueTheWayItWasPrinted() {
+    void ordersTheWeaveCatalogueNamesInRootOrder() {
         assertThat(sorted("twill 2/2", "twill 2/1/1/2", "sateen 5", "satin 5", "summer and winter 121"))
                 .containsExactly("sateen 5", "satin 5", "summer and winter 121", "twill 2/1/1/2", "twill 2/2");
     }

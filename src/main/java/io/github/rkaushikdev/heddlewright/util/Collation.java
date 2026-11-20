@@ -5,10 +5,11 @@ import java.util.Comparator;
 import java.util.Locale;
 
 /**
- * The order JavaScript's {@code localeCompare} puts strings in, which is the root collation.
+ * The Unicode root collation order (the CLDR root locale), for the lists people read.
  *
- * <p>Every sorted list a weaver reads (the weave catalogue, the fault codes, the loom register)
- * was ordered this way, so it is reproduced rather than swapped for code unit order. At the first
+ * <p>Every sorted list a weaver reads (the weave catalogue, the fault codes, the loom register) is
+ * ordered this way rather than by code unit, so "Twill" and "twill" sit together and "_" does not
+ * land after the letters. At the first
  * level white space and punctuation sort before digits and digits before letters, letters compare
  * without their case or accents; at the second level accents count; at the third, lower case comes
  * before upper. {@code java.text.Collator} is not used because it ignores punctuation that the
@@ -23,7 +24,7 @@ public final class Collation {
 
     private Collation() {}
 
-    /** Negative, zero or positive as {@code a.localeCompare(b)} would be. */
+    /** Negative, zero or positive as {@code a} sorts before, with or after {@code b}. */
     public static int compare(String a, String b) {
         int primary = byWeight(strip(a), strip(b));
         if (primary != 0) {

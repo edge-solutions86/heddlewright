@@ -32,7 +32,7 @@ class MachineTest {
 
         @Test
         void handsBackFrozenRecords() {
-            // A record has no setters, which is what freezing gave the JavaScript.
+            // A record has no setters, so nothing can change one after it is built.
             assertThat(Machine.listMachines().get(0).getClass().isRecord()).isTrue();
             assertThatThrownBy(() ->
                             Machine.listMachines().add(Machine.listMachines().get(0)))

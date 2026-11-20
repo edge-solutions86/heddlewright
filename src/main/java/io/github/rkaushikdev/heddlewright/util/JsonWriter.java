@@ -5,14 +5,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Writes {@link Json} out as text, byte for byte the way {@code JSON.stringify} does, and in the
- * canonical form the content ids and the journal hash.
+ * Writes {@link Json} out as RFC 8259 text in a fixed form: keys in the order the object holds
+ * them, numbers as {@link Text#number} writes them, non-finite numbers and absent array items as
+ * null, absent object fields left out, and only the characters {@link #quote} lists escaped. The
+ * canonical form, with keys sorted, is what the content ids and the journal hash, so its bytes
+ * never vary.
  */
 final class JsonWriter {
 
     private JsonWriter() {}
 
-    /** {@code JSON.stringify(value, null, indent)}; an indent of zero is the compact form. */
+    /** The value as JSON text, indented by that many spaces a level; an indent of zero is the compact form. */
     static String write(Json value, int indent) {
         StringBuilder out = new StringBuilder();
         if (value.isMissing()) {
@@ -128,7 +131,11 @@ final class JsonWriter {
         }
     }
 
-    /** A string as {@code JSON.stringify} quotes it. */
+    /**
+     * A string as a JSON string literal: quote, backslash, the control characters and any unpaired
+     * surrogate escaped, the common ones by their short escapes and the rest as backslash-u and four
+     * hex digits, and every other character as itself.
+     */
     static String quote(String text) {
         StringBuilder out = new StringBuilder(text.length() + 2);
         out.append('"');

@@ -44,7 +44,7 @@ class EstimateTest {
 
         @Test
         void leavesTheDefaultsFrozen() {
-            // A record has no setters, which is what freezing gave the JavaScript.
+            // A record has no setters, so nothing can change one after it is built.
             assertThat(Estimate.DEFAULT_RATES.getClass().isRecord()).isTrue();
         }
     }

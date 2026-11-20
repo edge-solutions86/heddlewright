@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-/** The shed timing of {@code loom/shed.js}, named apart from the draft's rising and sinking shed. */
+/** The shed timing over a turn of the crank, named apart from the draft's rising and sinking shed. */
 class ShedTimingTest {
 
     /** The default shed with only the cross angle moved. */
@@ -32,8 +32,8 @@ class ShedTimingTest {
 
         @Test
         void refusesSomethingThatIsNotAnAngle() {
-            // The JavaScript passed the word "early"; a double cannot hold a word, and NaN is the
-            // nearest thing to an angle that is not one.
+            // A timing that is not a number, such as the word "early", has no double form; NaN
+            // stands in for it.
             assertThatThrownBy(() -> ShedTiming.normaliseAngle(Double.NaN))
                     .isInstanceOf(InvalidArgumentException.class);
         }

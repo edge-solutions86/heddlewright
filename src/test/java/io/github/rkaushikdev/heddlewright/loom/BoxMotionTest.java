@@ -90,7 +90,7 @@ class BoxMotionTest {
 
         @Test
         void needsABoxCount() {
-            // The JavaScript left the count out; an int cannot be missing, so no boxes at all stands in.
+            // An int cannot be left out, so a loom with no boxes at all stands for a count nobody gave.
             assertThatThrownBy(() -> BoxMotion.allotBoxes(CHECK, 0)).isInstanceOf(InvalidArgumentException.class);
         }
     }
@@ -219,7 +219,7 @@ class BoxMotionTest {
         void refusesANegativeCost() {
             assertThatThrownBy(() -> BoxMotion.picksLostToChanging(chain, -1))
                     .isInstanceOf(InvalidArgumentException.class);
-            // The JavaScript passed the word "some"; NaN is the nearest a double comes to it.
+            // A cost that is not a number has no double form; NaN stands in for it.
             assertThatThrownBy(() -> BoxMotion.picksLostToChanging(chain, Double.NaN))
                     .isInstanceOf(InvalidArgumentException.class);
         }
@@ -237,7 +237,7 @@ class BoxMotionTest {
 
         @Test
         void needsASpeedToWorkFrom() {
-            // The JavaScript left the speed out; NaN stands in for a speed that is not there.
+            // A double cannot be left out, so NaN stands in for a speed nobody gave.
             assertThatThrownBy(() -> BoxMotion.speedWithChanging(chain, Double.NaN))
                     .isInstanceOf(InvalidArgumentException.class);
         }

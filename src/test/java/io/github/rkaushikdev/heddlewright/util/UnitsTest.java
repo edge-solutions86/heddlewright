@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 class UnitsTest {
 
-    /** vitest's toBeCloseTo(expected, digits): the difference is under half of ten to the minus digits. */
+    /** Close to a count of decimal places: the difference is under half of ten to the minus that count. */
     private static org.assertj.core.data.Offset<Double> digits(int count) {
         return within(Math.pow(10, -count) / 2);
     }
