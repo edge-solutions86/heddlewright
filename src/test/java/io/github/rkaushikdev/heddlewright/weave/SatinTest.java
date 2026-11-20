@@ -84,7 +84,7 @@ class SatinTest {
 
         @Test
         void bindsOncePerPickOnAFiveThreadSatinWithAMoveOfTwo() {
-            assertThat(Satin.satinWeave(5, 2).format()).isEqualTo(".XXXX\nXX.XX\nXXXX.\nX.XXX\nXXX.X");
+            assertThat(Satin.satinWeave(5, 2).format('o', '.')).isEqualTo(".oooo\noo.oo\noooo.\no.ooo\nooo.o");
         }
 
         @Test

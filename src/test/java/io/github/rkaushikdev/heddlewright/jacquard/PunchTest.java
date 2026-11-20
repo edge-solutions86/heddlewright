@@ -91,7 +91,7 @@ class PunchTest {
             List<Integer> tie = Harness.pointTie(4, 12);
             Matrix plan = Matrix.parse("XX..\n.XX.\n..XX");
             Matrix design = Punch.designFromHookPlan(plan, tie);
-            assertThat(design.format()).isEqualTo("XX...XXX...X\n.XX.XX.XX.XX\n..XXX...XXX.");
+            assertThat(design.format('o', '.')).isEqualTo("oo...ooo...o\n.oo.oo.oo.oo\n..ooo...ooo.");
             assertThat(Punch.tieConflicts(design, tie, 4)).isEmpty();
             assertThat(Punch.hookPlanFromDesign(design, tie, 4)).isEqualTo(plan);
         }

@@ -29,7 +29,7 @@ class ColourOrderTest {
 
         @Test
         void repeatsAShortColourOrderAcrossTheCloth() {
-            assertThat(ColourOrder.colourGrid(Matrix.parse("XXXX"), List.of("a", "b"), List.of("c"))
+            assertThat(ColourOrder.colourGrid(Matrix.parse("oooo", 'o', '.'), List.of("a", "b"), List.of("c"))
                             .get(0))
                     .containsExactly("a", "b", "a", "b");
         }

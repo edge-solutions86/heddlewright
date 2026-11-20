@@ -64,17 +64,17 @@ class HoneycombTest {
 
         @Test
         void buildsTheNestedCellOfAFiveShaftWaffle() {
-            assertThat(Honeycomb.honeycombWeave(5).format())
+            assertThat(Honeycomb.honeycombWeave(5).format('o', '.'))
                     .isEqualTo(String.join(
                             "\n",
-                            "XXXX.XXX",
-                            "XXX...XX",
-                            "XX.....X",
-                            "X.......",
+                            "oooo.ooo",
+                            "ooo...oo",
+                            "oo.....o",
+                            "o.......",
                             "........",
-                            "X.......",
-                            "XX.....X",
-                            "XXX...XX"));
+                            "o.......",
+                            "oo.....o",
+                            "ooo...oo"));
         }
 
         @Test

@@ -126,7 +126,7 @@ class LiftplanTest {
 
         @Test
         void findsThePicksThatLiftNothingAndThePicksThatLiftEverything() {
-            assertThat(Liftplan.shedlessPicks(Matrix.parse("....\nXXXX\nXX..")))
+            assertThat(Liftplan.shedlessPicks(Matrix.parse("....\noooo\noo..", 'o', '.')))
                     .containsExactly(
                             new Liftplan.ShedlessPick(1, "nothing lifted"),
                             new Liftplan.ShedlessPick(2, "everything lifted"));

@@ -86,7 +86,7 @@ class DobbyTest {
 
         @Test
         void refusesAPlanWiderThanTheDobby() {
-            assertThatThrownBy(() -> Dobby.chainFromLiftplan(Matrix.parse("XXXX"), 2))
+            assertThatThrownBy(() -> Dobby.chainFromLiftplan(Matrix.parse("oooo", 'o', '.'), 2))
                     .isInstanceOf(CapacityException.class);
         }
     }

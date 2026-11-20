@@ -81,7 +81,7 @@ class TwillTest {
 
         @Test
         void weavesThe31WarpFacedTwill() {
-            assertThat(Twill.twillWeave("3/1").format()).isEqualTo("XXX.\n.XXX\nX.XX\nXX.X");
+            assertThat(Twill.twillWeave("3/1").format('o', '.')).isEqualTo("ooo.\n.ooo\no.oo\noo.o");
         }
 
         @Test
@@ -176,7 +176,7 @@ class TwillTest {
         void turnsTheLineBackAndMakesAHerringbone() {
             Matrix cloth = Twill.pointedTwill("2/2", 4);
             assertThat(cloth.dimensions()).isEqualTo(new Matrix.Dimensions(4, 6));
-            assertThat(cloth.format()).isEqualTo("XX...X\n.XX.XX\n..XXX.\nX..X..");
+            assertThat(cloth.format('o', '.')).isEqualTo("oo...o\n.oo.oo\n..ooo.\no..o..");
         }
 
         @Test

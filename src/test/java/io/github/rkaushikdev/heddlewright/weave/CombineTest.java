@@ -24,7 +24,8 @@ class CombineTest {
 
         @Test
         void takesDifferentFactorsDownAndAcross() {
-            assertThat(Combine.expandWeave(Plain.plainWeave(), 1, 3).format()).isEqualTo("XXX...\n...XXX");
+            assertThat(Combine.expandWeave(Plain.plainWeave(), 1, 3).format('o', '.'))
+                    .isEqualTo("ooo...\n...ooo");
         }
 
         @Test
@@ -72,8 +73,8 @@ class CombineTest {
         @Test
         void raisesACellWhenEitherWeaveRaisesIt() {
             assertThat(Combine.overlayWeaves(Plain.plainWeave(), twill, Overlay.OVER)
-                            .format())
-                    .isEqualTo("XXX.\n.XXX\nX.XX\nXX.X");
+                            .format('o', '.'))
+                    .isEqualTo("ooo.\n.ooo\no.oo\noo.o");
         }
 
         @Test

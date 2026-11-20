@@ -23,6 +23,11 @@ class CommandsTest {
         return Commands.commandByName(parsed.command().orElseThrow()).run(parsed);
     }
 
+    /** What a command printed, with o for each raised end, which is how these tests write cloth. */
+    private static String raised(String text) {
+        return text.replace('X', 'o');
+    }
+
     private static List<String> names() {
         return Commands.listCommands().stream().map(Command::name).toList();
     }
@@ -113,8 +118,8 @@ class CommandsTest {
 
         @Test
         void followsTheTwillNotation() {
-            assertThat(run("draft", "--notation", "3/1", "--shafts", "4", "--ends", "4", "--picks", "4"))
-                    .contains("XXX.");
+            assertThat(raised(run("draft", "--notation", "3/1", "--shafts", "4", "--ends", "4", "--picks", "4")))
+                    .contains("ooo.");
         }
 
         @Test
@@ -151,7 +156,7 @@ class CommandsTest {
         void printsASatinAndNamesItsLegalMoves() {
             String text = run("weave", "--kind", "satin", "--threads", "5", "--move", "2");
             assertThat(lines(text).get(0)).isEqualTo("satin 5 move 2, legal moves 2 3");
-            assertThat(text).contains(".XXXX");
+            assertThat(raised(text)).contains(".oooo");
         }
 
         @Test

@@ -106,7 +106,13 @@ public final class Fixtures {
 
     /** A broad sixteen shaft dobby, for the styles the narrow one cannot take. */
     public static JsonObject wideLoom() {
-        return Json.obj("reference", "W1", "shedding", "dobby", "reedWidthCm", 260, "shafts", 16, "picksMinute", 200);
+        return wideLoom(200);
+    }
+
+    /** The broad dobby at a running speed, for the tests that need a slower one. */
+    public static JsonObject wideLoom(double picksMinute) {
+        return Json.obj(
+                "reference", "W1", "shedding", "dobby", "reedWidthCm", 260, "shafts", 16, "picksMinute", picksMinute);
     }
 
     /** A shirting order, priced and dated, with any fields laid over it. */

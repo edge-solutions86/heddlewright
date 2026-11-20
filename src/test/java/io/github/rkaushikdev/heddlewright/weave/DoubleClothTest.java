@@ -20,7 +20,7 @@ class DoubleClothTest {
     private static final Built BUILT = DoubleCloth.doubleCloth(Plain.plainWeave(), Plain.plainWeave());
 
     private static Built withCloth(String rows) {
-        return new Built(Matrix.parse(rows), BUILT.endLayers(), BUILT.pickLayers());
+        return new Built(Matrix.parse(rows, 'o', '.'), BUILT.endLayers(), BUILT.pickLayers());
     }
 
     private static List<Integer> indicesOf(List<Layer> layers, Layer wanted) {
@@ -58,7 +58,7 @@ class DoubleClothTest {
         @Test
         void buildsARepeatHoldingBothCloths() {
             assertThat(BUILT.cloth().dimensions()).isEqualTo(new Matrix.Dimensions(4, 4));
-            assertThat(BUILT.cloth().format()).isEqualTo("X...\nXXX.\n..X.\nX.XX");
+            assertThat(BUILT.cloth().format('o', '.')).isEqualTo("o...\nooo.\n..o.\no.oo");
         }
 
         @Test
@@ -103,13 +103,13 @@ class DoubleClothTest {
 
         @Test
         void findsABackEndRaisedOnAFacePick() {
-            assertThat(DoubleCloth.stitchingPoints(withCloth("XX..\nXXX.\n..X.\nX.XX")))
+            assertThat(DoubleCloth.stitchingPoints(withCloth("oo..\nooo.\n..o.\no.oo")))
                     .containsExactly(new DoubleCloth.StitchingPoint(1, 2, "back end raised on a face pick"));
         }
 
         @Test
         void findsAFaceEndLoweredOnABackPick() {
-            assertThat(DoubleCloth.stitchingPoints(withCloth("X...\n.XX.\n..X.\nX.XX"))
+            assertThat(DoubleCloth.stitchingPoints(withCloth("o...\n.oo.\n..o.\no.oo"))
                             .get(0)
                             .kind())
                     .isEqualTo("face end lowered on a back pick");
@@ -118,7 +118,7 @@ class DoubleClothTest {
         @Test
         void refusesAClothThatIsStitchedNamingTheFirstPoint() {
             DraftException err = catchThrowableOfType(
-                    DraftException.class, () -> DoubleCloth.assertLayersSeparate(withCloth("XX..\nXXX.\n..X.\nX.XX")));
+                    DraftException.class, () -> DoubleCloth.assertLayersSeparate(withCloth("oo..\nooo.\n..o.\no.oo")));
             assertThat(err).isNotNull();
             assertThat(err.detail().get("first").get("pick")).isEqualTo(Json.of(1));
         }

@@ -174,7 +174,7 @@ class DrawdownTest {
 
         @Test
         void findsAPickThatNeverBinds() {
-            assertThat(Drawdown.unwovenPicks(Matrix.parse("XXX\nX.X\n...")))
+            assertThat(Drawdown.unwovenPicks(Matrix.parse("ooo\no.o\n...", 'o', '.')))
                     .containsExactly(new Drawdown.UnwovenPick(1, "all warp"), new Drawdown.UnwovenPick(3, "all weft"));
         }
 

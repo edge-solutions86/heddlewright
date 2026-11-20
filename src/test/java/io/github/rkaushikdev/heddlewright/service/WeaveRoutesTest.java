@@ -23,6 +23,11 @@ class WeaveRoutesTest {
         router = WeaveRoutes.mountWeaveRoutes(Router.createRouter());
     }
 
+    /** A row the service printed, with o for each raised end, which is how these tests write cloth. */
+    private static String raised(Json row) {
+        return row.asText().replace('X', 'o');
+    }
+
     private Json get(String path) {
         return Router.handle(router, Request.get(path)).body();
     }
@@ -92,7 +97,7 @@ class WeaveRoutesTest {
         @Test
         void weavesATwillFromItsNotationAndReportsItsBalance() {
             Json twill = post("/twill", Json.obj("notation", "3/1"));
-            assertThat(twill.get("rows").at(0)).isEqualTo(Json.of("XXX."));
+            assertThat(raised(twill.get("rows").at(0))).isEqualTo("ooo.");
             assertThat(twill.get("balance")).isEqualTo(Json.obj("warp", 3, "weft", 1, "repeat", 4));
             assertThat(twill.get("angle")).isEqualTo(Json.NULL);
         }
@@ -119,7 +124,7 @@ class WeaveRoutesTest {
             Json satin = get("/satin/5");
             assertThat(satin.get("regular")).isEqualTo(Json.of(true));
             assertThat(satin.get("moves")).isEqualTo(Json.arr(2, 3));
-            assertThat(satin.get("rows").at(0)).isEqualTo(Json.of(".XXXX"));
+            assertThat(raised(satin.get("rows").at(0))).isEqualTo(".oooo");
         }
 
         @Test

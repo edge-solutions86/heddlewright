@@ -55,7 +55,7 @@ class DesignTest {
 
         @Test
         void refusesADesignWiderThanTheMachine() {
-            assertThatThrownBy(() -> Design.largestScale(Matrix.parse("XXXX"), 2))
+            assertThatThrownBy(() -> Design.largestScale(Matrix.parse("oooo", 'o', '.'), 2))
                     .isInstanceOf(CapacityException.class);
         }
     }
@@ -87,7 +87,7 @@ class DesignTest {
 
         @Test
         void refusesADesignWiderThanTheMachine() {
-            assertThatThrownBy(() -> Design.placeDesign(Matrix.parse("XXXX"), 2))
+            assertThatThrownBy(() -> Design.placeDesign(Matrix.parse("oooo", 'o', '.'), 2))
                     .isInstanceOf(CapacityException.class);
         }
     }

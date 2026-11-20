@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 class FloorRoutesTest {
 
     private static final JsonObject NARROW = Fixtures.narrowLoom();
-    private static final JsonObject WIDE = Fixtures.wideLoom().with("picksMinute", 180);
+    private static final JsonObject WIDE = Fixtures.wideLoom(180);
     private static final JsonObject ORDER = Fixtures.poplinOrder();
     private static final JsonObject RUN = Json.obj(
             "order",

@@ -26,7 +26,7 @@ class LenoTest {
 
         @Test
         void putsPlainWeaveWhereAGroupMeetsItselfAndFloatsElsewhere() {
-            assertThat(Leno.mockLeno(2).format()).isEqualTo(".XXX\nX.XX\nXX.X\nXXX.");
+            assertThat(Leno.mockLeno(2).format('o', '.')).isEqualTo(".ooo\no.oo\noo.o\nooo.");
         }
 
         @Test
