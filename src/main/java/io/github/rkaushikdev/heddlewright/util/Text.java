@@ -15,6 +15,13 @@ import java.util.List;
  */
 public final class Text {
 
+    /**
+     * The characters JavaScript's {@code \s} matches, as a regex character class. Java's own
+     * {@code \s} leaves out the Unicode spaces, so a pattern ported from JavaScript uses this.
+     */
+    public static final String SPACE_CLASS =
+            "[\\t\\n\\x{0b}\\f\\r \\x{a0}\\x{1680}\\x{2000}-\\x{200a}\\x{2028}\\x{2029}\\x{202f}\\x{205f}\\x{3000}\\x{feff}]";
+
     private Text() {}
 
     /** A number as JavaScript's {@code String(n)} writes it: 3, 0.5, 1e+21, -0.000001, 1e-7. */

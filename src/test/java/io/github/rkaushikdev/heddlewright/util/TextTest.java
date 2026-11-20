@@ -80,6 +80,15 @@ class TextTest {
     }
 
     @Test
+    void matchesJavaScriptWhiteSpaceInPatterns() {
+        String nbsp = String.valueOf((char) 0xa0);
+        assertThat(nbsp.matches(Text.SPACE_CLASS)).isTrue();
+        assertThat(nbsp.matches("\\s")).isFalse();
+        assertThat("x".matches(Text.SPACE_CLASS)).isFalse();
+        assertThat(Range.parseRange("1" + nbsp + "-" + nbsp + "3")).containsExactly(1, 2, 3);
+    }
+
+    @Test
     void quotesStringsTheWayStringifyDoes() {
         assertThat(Json.stringify("a\"b\\\n\u0001")).isEqualTo("\"a\\\"b\\\\\\n\\u0001\"");
         assertThat(Json.stringify(Json.obj("a", 1, "b", Json.arr()), 2)).isEqualTo("{\n  \"a\": 1,\n  \"b\": []\n}");

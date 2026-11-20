@@ -79,7 +79,7 @@ public final class Numeric {
     public static double roundTo(double value, int places) {
         Check.number(value, "value", Bounds.NONE);
         Check.integer(places, "places", Bounds.between(0, 12));
-        double factor = Math.pow(10, places);
+        double factor = StrictMath.pow(10, places);
         double scaled = value * factor;
         double rounded = Math.signum(scaled) * Math.round(Math.abs(scaled));
         return rounded / factor;

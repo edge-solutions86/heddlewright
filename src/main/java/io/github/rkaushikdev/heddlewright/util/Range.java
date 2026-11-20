@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
  */
 public final class Range {
 
-    private static final Pattern PART = Pattern.compile("^(-?\\d+)(?:\\s*-\\s*(-?\\d+))?$");
+    private static final Pattern PART =
+            Pattern.compile("^(-?\\d+)(?:" + Text.SPACE_CLASS + "*-" + Text.SPACE_CLASS + "*(-?\\d+))?$");
 
     private Range() {}
 
