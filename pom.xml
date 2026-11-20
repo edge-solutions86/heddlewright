@@ -133,8 +133,10 @@
           <failOnWarning>true</failOnWarning>
           <compilerArgs>
             <!-- -serial: the exceptions are never serialised; -processing: picocli-codegen
-                 reports options no processor claims while a source set has no commands. -->
+                 reports annotations no processor claims. -Aproject names the generated
+                 picocli reflection config. -->
             <arg>-Xlint:all,-serial,-processing</arg>
+            <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
           </compilerArgs>
           <annotationProcessorPaths>
             <path>
