@@ -6,9 +6,3 @@ build/
 out/
 .DS_Store
 *.log
-
-# The JavaScript toolchain, until its sources are removed.
-node_modules/
-coverage/
-.vitest/
-tmp/

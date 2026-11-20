@@ -13,13 +13,14 @@ Colour weaving and the layer check.
 - Costing works the loom time out at the speed the box changing leaves rather
   than the speed on the loom's plate.
 - `docs/architecture.md` is generated from the imports, and the build fails if
-  anything in `src` imports upwards through the layers.
-- Coverage floors are declared in the runner config, and `npm run coverage:report`
-  ranks the files dragging the figure down.
-- Shared test fixtures live in `tests/fixtures.js`. The four shaft twill had
+  any class uses one in a layer above its own.
+- The coverage floor is declared in the build, and the `Coverage` tool ranks the
+  classes dragging the figure down.
+- Shared test fixtures live in one `Fixtures` class. The four shaft twill had
   been written out in nine files and three of them had drifted.
-- `sum` and `sumBy` replace the hand written reduces that had accumulated across
-  the source. Three of them gave NaN rather than naming the record at fault.
+- `Numeric.sum` and `Numeric.sumBy` replace the totals that had been folded by
+  hand across the source. Three of them gave a wrong figure rather than naming
+  the record at fault.
 
 ## 0.1.0
 
@@ -42,4 +43,4 @@ The first working shed.
 - Works: orders, scheduling, production booking, costing, despatch and stock.
 - An append-only journal with a hash chain, a record projection over it, and
   snapshots.
-- An http service and a command line over the same code.
+- An HTTP service and a command line over the same code.
