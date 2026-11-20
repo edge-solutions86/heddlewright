@@ -199,6 +199,14 @@ public final class Check {
                 field + " must be an object", Json.obj("field", field, "got", describe(value)));
     }
 
+    /** A typed value that has to be there, refused the way a missing record is when it is not. */
+    public static <T> T object(T value, String field) {
+        if (value == null) {
+            throw new InvalidArgumentException(field + " must be an object", Json.obj("field", field, "got", "null"));
+        }
+        return value;
+    }
+
     /** A short, safe description of any value, for error detail. */
     public static String describe(Object value) {
         if (value instanceof Json json) {
