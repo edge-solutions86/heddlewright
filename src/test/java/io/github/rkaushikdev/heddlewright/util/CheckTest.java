@@ -163,8 +163,11 @@ class CheckTest {
     class PlainObject {
 
         @Test
-        void rejectsArraysAndNullWhichTypeofCallsObjects() {
+        void rejectsArraysAndNullThoughBothAreObjectsByType() {
             assertThat(Check.plainObject(Map.of("a", 1), "o")).isEqualTo(Json.obj("a", 1));
+            // A record is an object too, read by its components.
+            record Point(int a) {}
+            assertThat(Check.plainObject(new Point(1), "o")).isEqualTo(Json.obj("a", 1));
             assertThatThrownBy(() -> Check.plainObject(List.of(), "o")).hasMessageContaining("must be an object");
             assertThatThrownBy(() -> Check.plainObject(null, "o")).hasMessageContaining("must be an object");
         }

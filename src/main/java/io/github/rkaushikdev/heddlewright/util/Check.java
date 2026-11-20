@@ -123,7 +123,10 @@ public final class Check {
         return text;
     }
 
-    /** A value that is one of an allowed list, compared as JavaScript's {@code includes} would. */
+    /**
+     * A value that is one of an allowed list, compared by value: numbers of any boxed type by their
+     * double value, and a JSON value by what it holds.
+     */
     public static <T> T oneOf(T value, String field, Collection<?> allowed) {
         List<?> list = List.copyOf(allowed);
         Object plain = value instanceof Json json ? unwrap(json) : value;
@@ -187,13 +190,18 @@ public final class Check {
         return list;
     }
 
-    /** An object: a JSON object or a map, never an array and never null. */
+    /**
+     * An object: a JSON object, a map, or a Java record (read by its components, each one a key),
+     * never an array and never null.
+     */
     public static JsonObject plainObject(Object value, String field) {
         if (value instanceof JsonObject object) {
             return object;
         }
-        if (value instanceof Map<?, ?> map) {
-            return (JsonObject) Json.of(map);
+        if (value instanceof Map<?, ?> || value instanceof Record || value instanceof Json.Writable) {
+            if (Json.of(value) instanceof JsonObject object) {
+                return object;
+            }
         }
         throw new InvalidArgumentException(
                 field + " must be an object", Json.obj("field", field, "got", describe(value)));
@@ -236,7 +244,10 @@ public final class Check {
         return typeOf(value);
     }
 
-    /** JavaScript's {@code typeof} for a value. */
+    /**
+     * The type name an error detail reports for a value: undefined, number, bigint, string, boolean,
+     * function or object (null, arrays and records are objects).
+     */
     public static String typeOf(Object value) {
         if (value instanceof Json json) {
             return switch (json) {
